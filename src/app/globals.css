@@ -1,0 +1,261 @@
+@import "tailwindcss";
+
+:root {
+  --gr-primary: #164b34;
+  --gr-deep: #0c3323;
+  --gr-secondary: #246c49;
+  --gr-gold: #c6a66c;
+  --gr-light-gold: #e0c796;
+  --gr-cream: #f6f7f2;
+  --gr-white: #ffffff;
+  --gr-dark: #1c2921;
+  --gr-btn-radius: 0.5rem;
+  --font-serif-luxury: var(--font-cormorant), Georgia, serif;
+  --font-sans-luxury: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+}
+
+@theme inline {
+  --color-forest: var(--gr-primary);
+  --color-deep: var(--gr-deep);
+  --color-secondary-green: var(--gr-secondary);
+  --color-gold: var(--gr-gold);
+  --color-gold-light: var(--gr-light-gold);
+  --color-cream: var(--gr-cream);
+  --color-ink: var(--gr-dark);
+  --font-serif: var(--font-serif-luxury);
+  --font-sans: var(--font-sans-luxury);
+}
+
+html, body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+html {
+  scroll-behavior: smooth;
+  color: var(--gr-dark);
+  background-color: var(--gr-cream);
+}
+
+body {
+  font-family: var(--font-sans-luxury);
+  color: var(--gr-dark);
+  background-color: var(--gr-cream);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Container-based fluid scaling (WCAG 1.4.4 safe: max <= 2.5x min) */
+.fluid-container {
+  container-type: inline-size;
+}
+
+.fluid-hero-title {
+  font-size: clamp(2.125rem, 5.2vw, 4.5rem);
+}
+
+.fluid-section-title {
+  font-size: clamp(1.75rem, 3.6vw, 3.125rem);
+}
+
+@supports (font-size: 1cqi) {
+  .fluid-hero-title {
+    font-size: clamp(2.125rem, 6.2cqi, 4.5rem);
+  }
+  .fluid-section-title {
+    font-size: clamp(1.75rem, 4.2cqi, 3.125rem);
+  }
+}
+
+.gr-btn {
+  border-radius: var(--gr-btn-radius);
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+h1, h2, h3, .font-editorial {
+  font-family: var(--font-serif-luxury);
+  letter-spacing: -0.015em;
+}
+
+/* Luxury glass surface */
+.glass-emerald {
+  background: rgba(12, 51, 35, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(198, 166, 108, 0.24);
+}
+
+.glass-ivory {
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(22, 75, 52, 0.12);
+}
+
+/* Native <dialog> modal scroll containment (modern-web-guidance: dialog) */
+dialog.gr-dialog {
+  padding: 0;
+  border: none;
+  background: transparent;
+  max-inline-size: min(94dvw, 44rem);
+  max-block-size: 90dvh;
+  margin: auto;
+  overflow: visible;
+}
+
+dialog.gr-dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog.gr-dialog::backdrop {
+  background: rgba(12, 51, 35, 0.76);
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+/* Native <details>/<summary> FAQ accordion (modern-web-guidance: accordion) */
+.gr-accordion details {
+  border-bottom: 1px solid rgba(22, 75, 52, 0.14);
+}
+
+.gr-accordion summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  padding-block: 1.35rem;
+  font-weight: 600;
+  color: var(--gr-dark);
+  transition: color 0.2s ease;
+}
+
+.gr-accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.gr-accordion summary::before {
+  content: "";
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1.5px solid var(--gr-gold);
+  background:
+    linear-gradient(var(--gr-primary), var(--gr-primary)) center / 8px 1.5px no-repeat,
+    linear-gradient(var(--gr-primary), var(--gr-primary)) center / 1.5px 8px no-repeat;
+  transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.gr-accordion details[open] > summary {
+  color: var(--gr-primary);
+}
+
+.gr-accordion details[open] > summary::before {
+  background:
+    linear-gradient(var(--gr-white), var(--gr-white)) center / 8px 1.5px no-repeat;
+  background-color: var(--gr-primary);
+  border-color: var(--gr-primary);
+  transform: rotate(180deg);
+}
+
+.gr-accordion details::details-content {
+  interpolate-size: allow-keywords;
+  overflow: clip;
+  contain: layout;
+}
+
+.gr-accordion details:not([open])::details-content {
+  block-size: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gr-accordion details::details-content {
+    transition: block-size, content-visibility, display;
+    transition-duration: 0.32s;
+    transition-timing-function: ease-in-out;
+    transition-behavior: allow-discrete;
+  }
+}
+
+/* Efficient background processing for 3D WebGL hero container */
+.gr-canvas-host {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 680px;
+}
+
+/* Editorial rich text styling for blogs, projects, legal pages */
+.gr-prose h2 {
+  font-family: var(--font-serif-luxury);
+  font-size: 1.75rem;
+  line-height: 1.25;
+  color: var(--gr-deep);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.gr-prose h3 {
+  font-family: var(--font-serif-luxury);
+  font-size: 1.35rem;
+  color: var(--gr-primary);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.gr-prose p {
+  margin-bottom: 1rem;
+  line-height: 1.8;
+  color: rgba(28, 41, 33, 0.88);
+}
+
+.gr-prose ul, .gr-prose ol {
+  margin-bottom: 1.25rem;
+  padding-inline-start: 1.5rem;
+  line-height: 1.8;
+}
+
+.gr-prose ul {
+  list-style-type: disc;
+}
+
+.gr-prose ol {
+  list-style-type: decimal;
+}
+
+.gr-prose li {
+  margin-bottom: 0.45rem;
+}
+
+/* Custom luxury gold divider line */
+.gold-hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gr-gold), transparent);
+}
+
+/* Focus indicators */
+:focus-visible {
+  outline: 2px solid var(--gr-gold);
+  outline-offset: 2px;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
