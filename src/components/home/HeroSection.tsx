@@ -77,7 +77,7 @@ export default function HeroSection({
   return (
     <section
       ref={heroRef}
-      className="relative flex min-h-[78dvh] items-center overflow-hidden bg-[var(--gr-deep)] pb-16 pt-28 text-white sm:min-h-[82dvh] sm:pb-20 sm:pt-32 lg:pt-36"
+      className="relative flex min-h-[64dvh] items-center overflow-hidden bg-[var(--gr-deep)] pb-14 pt-28 text-white sm:min-h-[82dvh] sm:pb-20 sm:pt-32 lg:pt-36"
     >
       {/* Ultra-HD Cinematic Architectural Background Image (LCP high priority) */}
       <div ref={bgRef} className="absolute inset-0 z-0 will-change-transform">
@@ -152,35 +152,35 @@ export default function HeroSection({
             </p>
           )}
 
-          <div className="hero-stagger mt-8 flex flex-col gap-3 sm:mt-9 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+          <div className="hero-stagger mt-6 grid grid-cols-2 gap-2.5 sm:mt-9 sm:flex sm:flex-wrap sm:items-center sm:gap-4">
             {section.cta_primary_label && (
               <Link
                 href={section.cta_primary_url || "/properties"}
-                className="gr-btn group inline-flex min-h-[48px] w-full items-center justify-center gap-2.5 bg-[var(--gr-gold)] px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--gr-deep)] shadow-xl transition hover:bg-[var(--gr-light-gold)] sm:w-auto"
+                className="gr-btn group inline-flex min-h-[44px] items-center justify-center gap-1.5 bg-[var(--gr-gold)] px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--gr-deep)] shadow-xl transition hover:bg-[var(--gr-light-gold)] sm:min-h-[48px] sm:gap-2.5 sm:px-7 sm:py-3.5 sm:text-xs sm:tracking-[0.18em]"
               >
-                <span>{section.cta_primary_label}</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <span className="truncate">{section.cta_primary_label}</span>
+                <ArrowRight className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:translate-x-1 sm:h-4 sm:w-4" />
               </Link>
             )}
             {section.cta_secondary_label && (
               <Link
                 href={section.cta_secondary_url || "/contact#enquiry"}
-                className="gr-btn inline-flex min-h-[48px] w-full items-center justify-center gap-2.5 border border-[#C6A66C]/60 bg-white/5 px-7 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-md transition hover:border-[#E0C796] hover:bg-white/10 sm:w-auto"
+                className="gr-btn inline-flex min-h-[44px] items-center justify-center gap-1.5 border border-[#C6A66C]/60 bg-white/5 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md transition hover:border-[#E0C796] hover:bg-white/10 sm:min-h-[48px] sm:gap-2.5 sm:px-7 sm:py-3.5 sm:text-xs sm:tracking-[0.18em]"
               >
-                <CalendarCheck className="h-4 w-4 text-[#C6A66C]" />
-                <span>{section.cta_secondary_label}</span>
+                <CalendarCheck className="h-3.5 w-3.5 shrink-0 text-[#C6A66C] sm:h-4 sm:w-4" />
+                <span className="truncate">{section.cta_secondary_label}</span>
               </Link>
             )}
           </div>
 
           {/* Editorial Advisory Highlights Bar */}
-          <div className="hero-stagger mt-8 grid grid-cols-1 gap-3.5 border-t border-white/15 pt-5 sm:mt-10 sm:grid-cols-3 sm:pt-6">
+          <div className="hero-stagger mt-6 grid grid-cols-3 gap-2.5 border-t border-white/15 pt-4 sm:mt-10 sm:gap-4 sm:pt-6">
             {stats.map((item, idx) => (
-              <div key={idx} className="border-l border-[#C6A66C]/45 pl-4">
-                <p className="font-editorial text-xl font-semibold text-[#E0C796] sm:text-2xl">
+              <div key={idx} className="border-l border-[#C6A66C]/45 pl-2.5 sm:pl-4">
+                <p className="font-editorial text-base font-semibold leading-tight text-[#E0C796] sm:text-2xl">
                   {item.value}
                 </p>
-                <p className="mt-0.5 text-[11px] uppercase tracking-wider text-white/65 sm:text-xs">
+                <p className="mt-0.5 text-[10px] uppercase tracking-wider text-white/65 sm:text-xs">
                   {item.label}
                 </p>
               </div>

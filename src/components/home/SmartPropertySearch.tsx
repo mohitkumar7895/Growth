@@ -70,36 +70,36 @@ export default function SmartPropertySearch({
   return (
     <section
       id="smart-search"
-      className="relative z-20 -mt-8 pb-10 sm:-mt-10 sm:pb-12"
+      className="relative z-20 -mt-6 pb-8 sm:-mt-10 sm:pb-12"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-[#C6A66C]/35 bg-white p-6 shadow-2xl shadow-[#0C3323]/10 sm:p-8">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-[#164B34]/10 pb-4">
+        <div className="rounded-2xl border border-[#C6A66C]/35 bg-white p-4 shadow-2xl shadow-[#0C3323]/10 sm:p-8">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-2 border-b border-[#164B34]/10 pb-3 sm:mb-6 sm:pb-4">
             <div>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#C6A66C]">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#C6A66C] sm:text-[11px]">
                 <SlidersHorizontal className="h-3.5 w-3.5" />
                 Smart Property Discovery
               </span>
-              <h2 className="mt-1 font-editorial text-2xl font-semibold text-[#0C3323] sm:text-3xl">
+              <h2 className="mt-0.5 font-editorial text-xl font-semibold text-[#0C3323] sm:mt-1 sm:text-3xl">
                 {title || "Find Your Ideal Real Estate Opportunity"}
               </h2>
               {subtitle && (
-                <p className="mt-1 text-xs text-[#1C2921]/65 sm:text-sm">{subtitle}</p>
+                <p className="mt-0.5 hidden text-xs text-[#1C2921]/65 sm:mt-1 sm:block sm:text-sm">{subtitle}</p>
               )}
             </div>
             <button
               type="button"
               onClick={goToDirectory}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#164B34] transition hover:text-[#C6A66C]"
+              className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-[#164B34] transition hover:text-[#C6A66C] sm:text-xs"
             >
-              Open Full Directory
+              Full Directory
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
 
           <form
             onSubmit={handleSearch}
-            className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6"
+            className="grid grid-cols-2 gap-2.5 sm:gap-3.5 lg:grid-cols-3 xl:grid-cols-6"
           >
             <div>
               <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#164B34]">
@@ -200,11 +200,11 @@ export default function SmartPropertySearch({
               </select>
             </div>
 
-            <div className="flex items-end">
+            <div className="col-span-2 flex items-end sm:col-span-1">
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--gr-primary)] px-5 py-3 text-xs font-semibold uppercase tracking-wider text-white shadow-md transition hover:bg-[var(--gr-deep)] disabled:opacity-60"
+                className="gr-btn inline-flex min-h-[44px] w-full items-center justify-center gap-2 bg-[var(--gr-primary)] px-5 py-3 text-xs font-semibold uppercase tracking-wider text-white shadow-md transition hover:bg-[var(--gr-deep)] disabled:opacity-60"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

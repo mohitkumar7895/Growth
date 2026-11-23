@@ -27,9 +27,9 @@ export default function ContactSection({
   )}`;
 
   return (
-    <section id="enquiry" className="bg-[var(--gr-cream)] py-12 sm:py-14 lg:py-16">
+    <section id="enquiry" className="bg-[var(--gr-cream)] py-9 sm:py-14 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-10">
           {/* Left Info & Map */}
           <div className="lg:col-span-5">
             <SectionHeader
@@ -39,55 +39,55 @@ export default function ContactSection({
               description={description}
             />
 
-            <div className="mt-8 space-y-4">
-              <div className="flex items-start gap-4 rounded-xl border border-[#164B34]/12 bg-white p-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#0C3323] text-[#E0C796]">
-                  <Phone className="h-5 w-5" />
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:mt-7 sm:gap-4">
+              <div className="flex items-center gap-3.5 rounded-xl border border-[#164B34]/12 bg-white p-3.5 sm:p-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#0C3323] text-[#E0C796] sm:h-11 sm:w-11">
+                  <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#246C49]">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[#246C49] sm:text-[11px]">
                     Direct Advisory Line
                   </p>
                   <a
                     href={`tel:${phone.replace(/\s+/g, "")}`}
-                    className="mt-0.5 block font-editorial text-2xl font-semibold text-[#0C3323] hover:text-[#164B34]"
+                    className="block font-editorial text-xl font-semibold text-[#0C3323] hover:text-[#164B34] sm:text-2xl"
                   >
                     {phone}
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 rounded-xl border border-[#164B34]/12 bg-white p-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#0C3323] text-[#E0C796]">
-                  <Mail className="h-5 w-5" />
+              <div className="flex items-center gap-3.5 rounded-xl border border-[#164B34]/12 bg-white p-3.5 sm:p-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#0C3323] text-[#E0C796] sm:h-11 sm:w-11">
+                  <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#246C49]">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[#246C49] sm:text-[11px]">
                     Email Correspondence
                   </p>
                   <a
                     href={`mailto:${email}`}
-                    className="mt-0.5 block break-all text-sm font-semibold text-[#0C3323] hover:text-[#164B34]"
+                    className="block break-all text-xs font-semibold text-[#0C3323] hover:text-[#164B34] sm:text-sm"
                   >
                     {email}
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 rounded-xl border border-[#164B34]/12 bg-white p-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#0C3323] text-[#E0C796]">
-                  <MapPin className="h-5 w-5" />
+              <div className="flex items-start gap-3.5 rounded-xl border border-[#164B34]/12 bg-white p-3.5 sm:p-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#0C3323] text-[#E0C796] sm:h-11 sm:w-11">
+                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#246C49]">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[#246C49] sm:text-[11px]">
                     Regional Presence
                   </p>
-                  <p className="mt-0.5 text-sm font-semibold text-[#0C3323]">
+                  <p className="text-xs font-semibold text-[#0C3323] sm:text-sm">
                     {location}
                   </p>
                   {settings.business_timings && (
-                    <p className="mt-1 flex items-center gap-1.5 text-xs text-[#1C2921]/65">
-                      <Clock className="h-3.5 w-3.5 text-[#C6A66C]" />
+                    <p className="mt-0.5 flex items-center gap-1.5 text-[11px] text-[#1C2921]/65 sm:text-xs">
+                      <Clock className="h-3 w-3 shrink-0 text-[#C6A66C]" />
                       {settings.business_timings}
                     </p>
                   )}
@@ -96,41 +96,41 @@ export default function ContactSection({
             </div>
 
             {/* Quick Action Buttons */}
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-4 flex flex-wrap gap-2 sm:mt-6 sm:gap-3">
               <a
                 href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-5 py-3 text-xs font-semibold uppercase tracking-wider text-white shadow-sm transition hover:brightness-105"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#25D366] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-white shadow-sm transition hover:brightness-105 sm:px-5 sm:py-3 sm:text-xs"
               >
                 <MessageCircle className="h-4 w-4" />
-                WhatsApp Advisory
+                WhatsApp
               </a>
               <a
                 href={`tel:${phone.replace(/\s+/g, "")}`}
-                className="inline-flex items-center gap-2 rounded-lg bg-[#0C3323] px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[#E0C796] transition hover:bg-[#164B34]"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#0C3323] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#E0C796] transition hover:bg-[#164B34] sm:px-5 sm:py-3 sm:text-xs"
               >
                 <Phone className="h-4 w-4" />
                 Call Now
               </a>
               <a
                 href={`mailto:${email}`}
-                className="inline-flex items-center gap-2 rounded-lg border border-[#164B34]/25 bg-white px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[#164B34] transition hover:border-[#164B34]"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#164B34]/25 bg-white px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#164B34] transition hover:border-[#164B34] sm:px-5 sm:py-3 sm:text-xs"
               >
                 <Mail className="h-4 w-4" />
-                Email Us
+                Email
               </a>
             </div>
 
             {/* Embedded Google Map */}
             {settings.google_maps_embed && (
-              <div className="mt-6 overflow-hidden rounded-2xl border border-[#164B34]/15 shadow-sm">
+              <div className="mt-4 overflow-hidden rounded-2xl border border-[#164B34]/15 shadow-sm sm:mt-6">
                 <iframe
                   title="Growth Realtech Noida Location Map"
                   src={settings.google_maps_embed}
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  className="h-52 w-full border-0"
+                  className="h-40 w-full border-0 sm:h-52"
                 />
               </div>
             )}
@@ -138,7 +138,7 @@ export default function ContactSection({
 
           {/* Right Consultation Request Form */}
           <div className="lg:col-span-7">
-            <div className="rounded-2xl border border-[#C6A66C]/35 bg-[#0C3323] p-6 text-white shadow-2xl sm:p-10">
+            <div className="rounded-2xl border border-[#C6A66C]/35 bg-[#0C3323] p-5 text-white shadow-2xl sm:p-10">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#C6A66C]">
                 Direct Enquiry Desk
               </p>

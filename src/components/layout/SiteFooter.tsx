@@ -39,10 +39,10 @@ export default function SiteFooter({
 
   return (
     <footer className={`border-t border-[#C6A66C]/25 ${footerBg} text-white`}>
-      <div className="mx-auto max-w-7xl px-4 pb-8 pt-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-12 lg:gap-10">
+      <div className="mx-auto max-w-7xl px-4 pb-6 pt-9 sm:px-6 sm:pb-8 sm:pt-12 lg:px-8">
+        <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-12 lg:gap-10">
           {/* Brand Column */}
-          <div className="lg:col-span-4">
+          <div className="col-span-2 lg:col-span-4">
             <Link href="/" className="inline-flex items-center gap-3">
               {settings.logo_url ? (
                 <div className="rounded-xl bg-white/95 px-4 py-2 shadow-md ring-1 ring-[#C6A66C]/45">
@@ -91,11 +91,11 @@ export default function SiteFooter({
           </div>
 
           {/* Navigation */}
-          <div className="lg:col-span-2">
+          <div className="col-span-1 lg:col-span-2">
             <h3 className="font-editorial text-lg font-semibold text-[#E0C796]">
               Explore
             </h3>
-            <ul className="mt-4 space-y-2.5 text-sm text-white/75">
+            <ul className="mt-3 space-y-2 text-xs text-white/75 sm:mt-4 sm:space-y-2.5 sm:text-sm">
               {quickLinks.map((link) => (
                 <li key={link.id}>
                   <Link
@@ -110,11 +110,11 @@ export default function SiteFooter({
           </div>
 
           {/* Services */}
-          <div className="lg:col-span-3">
+          <div className="col-span-1 lg:col-span-3">
             <h3 className="font-editorial text-lg font-semibold text-[#E0C796]">
               Consulting Services
             </h3>
-            <ul className="mt-4 space-y-2.5 text-sm text-white/75">
+            <ul className="mt-3 space-y-2 text-xs text-white/75 sm:mt-4 sm:space-y-2.5 sm:text-sm">
               {services.slice(0, 7).map((service) => (
                 <li key={service.id}>
                   <Link
@@ -129,7 +129,7 @@ export default function SiteFooter({
           </div>
 
           {/* Categories & Contact */}
-          <div className="lg:col-span-3">
+          <div className="col-span-2 lg:col-span-3">
             <h3 className="font-editorial text-lg font-semibold text-[#E0C796]">
               Property Verticals
             </h3>

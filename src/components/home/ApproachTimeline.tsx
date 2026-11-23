@@ -30,7 +30,7 @@ export default function ApproachTimeline({
   ctaUrl?: string | null;
 }) {
   return (
-    <section className="bg-white py-12 sm:py-14 lg:py-16">
+    <section className="bg-white py-9 sm:py-14 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           badge={badge}
@@ -40,30 +40,30 @@ export default function ApproachTimeline({
           align="center"
         />
 
-        <div className="relative mt-9 sm:mt-10">
+        <div className="relative mt-6 sm:mt-10">
           {/* Connecting gold line on desktop */}
           <div
             aria-hidden="true"
             className="absolute left-0 right-0 top-12 hidden h-[1px] bg-gradient-to-r from-transparent via-[#C6A66C]/60 to-transparent lg:block"
           />
 
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
             {steps.map((step, index) => (
               <motion.div
                 key={step.number}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.55, delay: index * 0.1 }}
-                className="group relative rounded-2xl border border-[#164B34]/12 bg-[#F6F7F2] p-7 transition hover:-translate-y-1 hover:border-[#C6A66C] hover:bg-white hover:shadow-xl"
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.45, delay: Math.min(index * 0.06, 0.2) }}
+                className="group relative rounded-2xl border border-[#164B34]/12 bg-[#F6F7F2] p-4 transition hover:-translate-y-1 hover:border-[#C6A66C] hover:bg-white hover:shadow-xl sm:p-7"
               >
-                <div className="relative z-10 mb-6 flex h-14 w-14 items-center justify-center rounded-xl border border-[#C6A66C]/50 bg-[#0C3323] font-editorial text-2xl font-bold text-[#E0C796] shadow-md transition group-hover:scale-105">
+                <div className="relative z-10 mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-[#C6A66C]/50 bg-[#0C3323] font-editorial text-lg font-bold text-[#E0C796] shadow-md transition group-hover:scale-105 sm:mb-6 sm:h-14 sm:w-14 sm:text-2xl">
                   {step.number}
                 </div>
-                <h3 className="font-editorial text-2xl font-semibold text-[#0C3323]">
+                <h3 className="font-editorial text-lg font-semibold leading-snug text-[#0C3323] sm:text-2xl">
                   {step.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-[#1C2921]/75">
+                <p className="mt-1.5 text-xs leading-relaxed text-[#1C2921]/75 sm:mt-3 sm:text-sm">
                   {step.description}
                 </p>
               </motion.div>
@@ -72,7 +72,7 @@ export default function ApproachTimeline({
         </div>
 
         {ctaLabel && ctaUrl && (
-          <div className="mt-12 text-center">
+          <div className="mt-8 text-center sm:mt-10">
             <Link
               href={ctaUrl}
               className="inline-flex items-center gap-2 rounded-lg bg-[var(--gr-primary)] px-7 py-3.5 text-xs font-semibold uppercase tracking-wider text-white shadow-md transition hover:bg-[var(--gr-deep)]"

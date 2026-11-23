@@ -47,7 +47,7 @@ export default function FeaturedProjectsSection({
   }, [projects, activeFilter]);
 
   return (
-    <section className="bg-white py-12 sm:py-14 lg:py-16">
+    <section className="bg-white py-9 sm:py-14 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <SectionHeader
@@ -59,7 +59,7 @@ export default function FeaturedProjectsSection({
           {showAllCta && (
             <Link
               href="/projects"
-              className="gr-btn inline-flex shrink-0 items-center gap-2 self-start border border-[#164B34]/25 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#164B34] transition hover:border-[#164B34] hover:bg-[#164B34] hover:text-white lg:self-end"
+              className="gr-btn inline-flex shrink-0 items-center gap-2 self-start border border-[#164B34]/25 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[#164B34] transition hover:border-[#164B34] hover:bg-[#164B34] hover:text-white sm:px-5 sm:py-2.5 lg:self-end"
             >
               <span>View All Projects</span>
               <ArrowUpRight className="h-4 w-4" />
@@ -68,7 +68,7 @@ export default function FeaturedProjectsSection({
         </div>
 
         {/* Working Category & Region Filters (swipeable row on mobile) */}
-        <div className="no-scrollbar -mx-4 mt-6 flex flex-nowrap gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:mt-7 sm:flex-wrap sm:overflow-visible sm:px-0">
+        <div className="no-scrollbar -mx-4 mt-5 flex flex-nowrap gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:mt-7 sm:flex-wrap sm:overflow-visible sm:px-0">
           {FILTERS.map((filter) => {
             const selected = activeFilter === filter;
             return (
@@ -76,7 +76,7 @@ export default function FeaturedProjectsSection({
                 key={filter}
                 type="button"
                 onClick={() => setActiveFilter(filter)}
-                className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition sm:px-5 ${
+                className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition sm:px-5 sm:py-2.5 ${
                   selected
                     ? "bg-[var(--gr-primary)] text-white shadow-md"
                     : "border border-[#164B34]/15 bg-[#F6F7F2] text-[#1C2921]/80 hover:border-[#C6A66C] hover:text-[#0C3323]"
@@ -88,20 +88,24 @@ export default function FeaturedProjectsSection({
           })}
         </div>
 
-        {/* Project Cards Grid */}
+        {/* Project Cards: Horizontal snap-carousel on mobile, grid on tablet/desktop */}
         {filtered.length === 0 ? (
-          <div className="mt-12 rounded-2xl border border-[#164B34]/10 bg-[#F6F7F2] p-12 text-center">
+          <div className="mt-8 rounded-2xl border border-[#164B34]/10 bg-[#F6F7F2] p-10 text-center">
             <p className="text-sm text-[#1C2921]/70">
               No projects currently match the &ldquo;{activeFilter}&rdquo; filter.
             </p>
           </div>
         ) : (
-          <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((project) => (
-              <article
-                key={project.id}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-[#164B34]/12 bg-[#F6F7F2] transition duration-300 hover:-translate-y-1.5 hover:border-[#C6A66C]/60 hover:shadow-2xl hover:shadow-[#0C3323]/10"
-              >
+          <>
+            <p className="mt-4 text-[11px] font-medium text-[#246C49] sm:hidden">
+              Swipe horizontally to explore all {filtered.length} projects →
+            </p>
+            <div className="no-scrollbar -mx-4 mt-3 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:mt-8 sm:grid sm:grid-cols-2 sm:gap-7 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
+              {filtered.map((project) => (
+                <article
+                  key={project.id}
+                  className="group flex w-[82vw] max-w-[330px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-[#164B34]/12 bg-[#F6F7F2] transition duration-300 hover:-translate-y-1.5 hover:border-[#C6A66C]/60 hover:shadow-2xl hover:shadow-[#0C3323]/10 sm:w-auto sm:max-w-none"
+                >
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#0C3323]">
                   <Image
                     src={project.featured_image || "/images/project-commercial-plaza.jpg"}
@@ -186,6 +190,7 @@ export default function FeaturedProjectsSection({
               </article>
             ))}
           </div>
+          </>
         )}
       </div>
 
