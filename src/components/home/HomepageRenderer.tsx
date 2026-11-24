@@ -240,7 +240,7 @@ export default function HomepageRenderer({
                       </div>
                       <div className="glass-emerald relative z-10 mx-3 -mt-8 rounded-xl p-4 sm:mx-6 sm:-mt-12 sm:p-5 lg:ml-6 lg:mr-0">
                         <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#C6A66C]">
-                          Our Commitment
+                          Your Growth, Our Commitment!
                         </p>
                         <p className="mt-1 text-xs leading-relaxed text-white/90 sm:mt-1.5 sm:text-sm">
                           {about.commitment ||
@@ -293,7 +293,7 @@ export default function HomepageRenderer({
                       {section.cta_primary_label && (
                         <Link
                           href={section.cta_primary_url || "/about"}
-                          className="inline-flex items-center gap-2 rounded-lg bg-[var(--gr-gold)] px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-[var(--gr-deep)] transition hover:bg-[var(--gr-light-gold)]"
+                          className="gr-btn inline-flex items-center gap-2 bg-[var(--gr-gold)] px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-[var(--gr-deep)] transition hover:bg-[var(--gr-light-gold)]"
                         >
                           <span>{section.cta_primary_label}</span>
                           <ArrowRight className="h-4 w-4" />
@@ -302,12 +302,36 @@ export default function HomepageRenderer({
                       {section.cta_secondary_label && (
                         <Link
                           href={section.cta_secondary_url || "/contact#enquiry"}
-                          className="inline-flex items-center gap-2 rounded-lg border border-white/25 px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-white transition hover:border-[#C6A66C] hover:text-[#E0C796]"
+                          className="gr-btn inline-flex items-center gap-2 border border-white/25 px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-white transition hover:border-[#C6A66C] hover:text-[#E0C796]"
                         >
                           <span>{section.cta_secondary_label}</span>
                         </Link>
                       )}
                     </div>
+                  </div>
+                </div>
+
+                {/* Official Growth Realtech Brand Showcase Strip */}
+                <div className="mt-8 grid grid-cols-1 gap-4 border-t border-white/15 pt-8 sm:mt-10 sm:grid-cols-2 sm:gap-6">
+                  <div className="overflow-hidden rounded-2xl border border-[#C6A66C]/35 bg-[#082418] shadow-xl">
+                    <Image
+                      src="/images/branding/brand-solutions-banner.jpg"
+                      alt="Growth Realtech — Real Estate Solutions for a Better Tomorrow"
+                      width={1024}
+                      height={576}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="overflow-hidden rounded-2xl border border-[#C6A66C]/35 bg-white shadow-xl">
+                    <Image
+                      src="/images/branding/brand-card-ankita.jpg"
+                      alt="Growth Realtech — Ankita Gupta Real Estate Consultant Noida"
+                      width={1024}
+                      height={576}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                 </div>
               </div>

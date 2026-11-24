@@ -108,6 +108,30 @@ export default async function AboutPage() {
           </div>
         </div>
 
+        {/* Official Brand Identity & Consultant Card */}
+        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="overflow-hidden rounded-2xl border border-[#C6A66C]/40 bg-[#0C3323] shadow-xl">
+            <Image
+              src="/images/branding/brand-solutions-banner.jpg"
+              alt="Growth Realtech — Real Estate Solutions for a Better Tomorrow"
+              width={1024}
+              height={576}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="overflow-hidden rounded-2xl border border-[#C6A66C]/40 bg-white shadow-xl">
+            <Image
+              src="/images/branding/brand-card-ankita.jpg"
+              alt="Growth Realtech — Ankita Gupta Real Estate Consultant"
+              width={1024}
+              height={576}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+
         {/* Principles Grid */}
         {whyData.features && whyData.features.length > 0 && (
           <div className="mt-24">

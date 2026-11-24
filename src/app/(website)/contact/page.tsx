@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getWebsiteSettings } from "@/services/siteData";
 import { buildPageMetadata } from "@/lib/seo";
 import PageHeroBanner from "@/components/common/PageHeroBanner";
@@ -32,10 +33,32 @@ export default async function ContactPage() {
         description="Whether buying a residence, evaluating commercial suites, acquiring industrial plots, or listing a resale asset, we are here to help."
       />
 
-      {/* General Contact Message Box stored in contact_submissions */}
-      <section className="bg-white py-16 lg:py-20">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-[#164B34]/15 bg-white p-8 shadow-lg sm:p-10">
+      {/* Official Brand Card & General Contact Message Box */}
+      <section className="bg-white py-12 lg:py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="overflow-hidden rounded-2xl border border-[#C6A66C]/40 bg-white shadow-lg">
+              <Image
+                src="/images/branding/brand-card-ankita.jpg"
+                alt="Growth Realtech — Ankita Gupta Real Estate Consultant Noida"
+                width={1024}
+                height={576}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <div className="overflow-hidden rounded-2xl border border-[#C6A66C]/40 bg-[#0C3323] shadow-lg">
+              <Image
+                src="/images/branding/brand-solutions-banner.jpg"
+                alt="Growth Realtech — Real Estate Solutions for a Better Tomorrow"
+                width={1024}
+                height={576}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          </div>
+          <div className="mx-auto max-w-4xl rounded-2xl border border-[#164B34]/15 bg-white p-6 shadow-lg sm:p-10">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#C6A66C]">
               General Correspondence
             </p>

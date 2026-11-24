@@ -27,7 +27,16 @@ export default async function ServicesPage() {
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Services" }]}
       />
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+        <div className="mb-10 overflow-hidden rounded-2xl border border-[#C6A66C]/40 bg-[#0C3323] shadow-xl">
+          <Image
+            src="/images/branding/brand-solutions-banner.jpg"
+            alt="Growth Realtech — Real Estate Solutions for a Better Tomorrow"
+            width={1600}
+            height={900}
+            className="h-auto w-full object-cover"
+          />
+        </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {services.map((service) => (
             <article
