@@ -16,6 +16,7 @@ import {
   HelpCircle,
   Image as ImageIcon,
   Users,
+  UserCheck,
   Mail,
   Inbox,
   Search,
@@ -39,6 +40,7 @@ interface NavItem {
 
 const ADMIN_NAV: NavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard, permission: "dashboard.view", group: "Overview" },
+  { label: "Customer Registrations", href: "/admin/customers", icon: UserCheck, permission: "enquiries.manage", group: "Leads & CRM" },
   { label: "Enquiries CRM", href: "/admin/enquiries", icon: Inbox, permission: "enquiries.manage", group: "Leads & CRM" },
   { label: "Contact Requests", href: "/admin/contacts", icon: Mail, permission: "contacts.manage", group: "Leads & CRM" },
   { label: "Homepage & About", href: "/admin/homepage", icon: Home, permission: "homepage.manage", group: "Website CMS" },
