@@ -56,6 +56,7 @@ INSERT INTO `website_settings` (`setting_key`, `setting_group`, `setting_value`,
 ('favicon_url', 'general', '/images/growth-realtech-logo.png', 'url'),
 ('contact_phone', 'contact', '+91 82875 69844', 'string'),
 ('contact_email', 'contact', 'growthrealtechnoida@gmail.com', 'string'),
+('contact_email_secondary', 'contact', 'care@growthrealtech.in', 'string'),
 ('contact_location', 'contact', 'Noida, Uttar Pradesh', 'string'),
 ('contact_address', 'contact', 'Noida, Uttar Pradesh, India — Serving Noida, Greater Noida, Greater Noida West & Yamuna Expressway', 'text'),
 ('whatsapp_number', 'contact', '918287569844', 'string'),
@@ -156,6 +157,7 @@ INSERT INTO `homepage_sections` (
   'Our Pillars',
   'Every recommendation is anchored in transparent communication, grounded local insight, and structured transaction coordination.',
   JSON_OBJECT(
+    'tagline', 'TRUST | TRANSPARENCY | SAFE INVESTMENT',
     'items', JSON_ARRAY(
       JSON_OBJECT('icon', 'Compass', 'title', 'Personalised Advisory', 'description', 'Tailored shortlists aligned to your purpose, horizon, and risk profile—never one-size-fits-all inventory pushing.'),
       JSON_OBJECT('icon', 'ShieldCheck', 'title', 'Transparent Process', 'description', 'Clear documentation checklists, RERA verification guidance, and straightforward fee and cost communication.'),
@@ -337,7 +339,7 @@ INSERT INTO `projects` (
   'Sector 132, Noida', 'Sector 132', 'Noida',
   'A landmark mixed-use commercial and IT/ITES destination strategically positioned along the Noida-Greater Noida Expressway.',
   '<p>Orion One32 is a prominent commercial development located in Sector 132 along the Noida-Greater Noida Expressway, positioned amidst established corporate campuses, educational institutions, and dense residential catchments.</p><p>The development integrates contemporary IT/ITES office spaces with landscaped retail plazas designed for modern business ecosystems. Growth Realtech assists clients with current inventory orientation, floor plate suitability, and verification of official developer documentation and UP-RERA filings prior to any commitment.</p><p><em>Advisory Note: All pricing, current unit availability, delivery schedules, and RERA registration particulars are confirmed strictly against official developer disclosures during consultation.</em></p>',
-  '/images/project-commercial-plaza.jpg',
+  '/images/projects/orion-one32.webp',
   'Verify official UP-RERA registration during consultation',
   'Reference project showcase — official UP-RERA details and developer disclosures verified on enquiry.',
   'Price on Request', 'IT/ITES Office Spaces & High-Street Retail (Enquire for Sizes)',
@@ -353,7 +355,7 @@ INSERT INTO `projects` (
   'Sector 142, Noida', 'Sector 142', 'Noida',
   'Contemporary commercial office and retail destination near Sector 142 Metro Station on the Noida Expressway.',
   '<p>Onyx by Splendor in Sector 142, Noida sits along one of the most active IT and corporate hubs of the Noida-Greater Noida Expressway, benefiting from proximity to the Sector 142 Aqua Line Metro connectivity.</p><p>Designed to cater to modern enterprises, consulting firms, and curated retail operators, the project attracts both end-user corporate occupiers and commercial investors. Connect with Growth Realtech for a guided evaluation, site tour, and verification of current official specifications.</p>',
-  '/images/category-commercial.jpg',
+  '/images/projects/onyx-by-splendor.webp',
   'Verify official UP-RERA registration during consultation',
   'Reference project showcase — official UP-RERA details and developer disclosures verified on enquiry.',
   'Price on Request', 'Commercial Office Spaces & Retail Units (Enquire for Details)',
@@ -369,7 +371,7 @@ INSERT INTO `projects` (
   'Sector 152, Noida', 'Sector 152', 'Noida',
   'Sculpted glass-facade luxury residences situated in Sector 152, one of Noida Expressway’s prominent green residential sectors.',
   '<p>ACE Starlit is a contemporary residential development in Sector 152, Noida, notable for its low-density green neighbourhood profile along the Noida-Greater Noida Expressway.</p><p>Designed with modern facade architecture, landscaped greens, and clubhouse amenities tailored for upscale urban living, Sector 152 offers balanced connectivity to both Noida corporate zones and Greater Noida. Growth Realtech facilitates guided site visits, layout comparisons, and transparent cost-sheet reviews.</p>',
-  '/images/project-luxury-residences.jpg',
+  '/images/projects/ace-starlit.jpg',
   'Verify official UP-RERA registration during consultation',
   'Reference project showcase — official UP-RERA details and developer disclosures verified on enquiry.',
   'Price on Request', 'Luxury Residential Apartments (Enquire for Configurations)',
@@ -385,7 +387,7 @@ INSERT INTO `projects` (
   'Greater Noida West', 'Sector 12 / Greater Noida West', 'Greater Noida',
   'Spacious contemporary luxury residences crafted for elevated family living in Greater Noida West.',
   '<p>ACE HAN''EI brings an architectural focus on expansive living spaces, open landscaped greens, and refined lifestyle amenities to Greater Noida West.</p><p>With improving civic connectivity linking Noida, Greater Noida, and Delhi NCR, the development appeals to end-user families seeking larger floor plans in a planned community. Speak with our residential advisors to review layouts, verify RERA particulars, and schedule a private site walkthrough.</p>',
-  '/images/category-residential.jpg',
+  '/images/projects/ace-hanei.webp',
   'Verify official UP-RERA registration during consultation',
   'Reference project showcase — official UP-RERA details and developer disclosures verified on enquiry.',
   'Price on Request', 'Spacious Luxury Residences (Enquire for Layouts)',
@@ -401,7 +403,7 @@ INSERT INTO `projects` (
   'Yamuna Expressway', 'Yamuna Expressway Corridor', 'Yamuna Expressway',
   'A modern mixed-use commercial and lifestyle opportunity positioned along the emerging Yamuna Expressway growth corridor.',
   '<p>DXN Orion is positioned along the Yamuna Expressway corridor, a region witnessing significant long-term infrastructure attention due to regional aviation, industrial, and institutional planning.</p><p>Growth Realtech helps buyers and commercial evaluators examine location fundamentals, access roads, surrounding catchment development, and official regulatory filings before making any decision.</p>',
-  '/images/category-prerented.jpg',
+  '/images/projects/dxn-orion.jpg',
   'Verify official UP-RERA registration during consultation',
   'Reference project showcase — official UP-RERA details and developer disclosures verified on enquiry.',
   'Price on Request', 'Commercial & Business Spaces (Enquire for Options)',
@@ -417,7 +419,7 @@ INSERT INTO `projects` (
   'Yamuna Expressway', 'Yamuna Expressway Corridor', 'Yamuna Expressway',
   'Contemporary residential living situated within the rapidly evolving Yamuna Expressway township ecosystem.',
   '<p>Gaur Alaris represents modern residential living along the Yamuna Expressway belt, offering connectivity to major expressway corridors, institutional hubs, and the upcoming airport influence region.</p><p>Our advisors provide balanced perspective on end-use suitability, neighbourhood infrastructure progress, official RERA details, and unit configurations through a transparent consultation process.</p>',
-  '/images/category-investment.jpg',
+  '/images/projects/gaur-alaris.webp',
   'Verify official UP-RERA registration during consultation',
   'Reference project showcase — official UP-RERA details and developer disclosures verified on enquiry.',
   'Price on Request', 'Modern Residential Units (Enquire for Configurations)',
@@ -430,21 +432,21 @@ INSERT INTO `projects` (
 )
 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`), `featured_image` = VALUES(`featured_image`);
 
--- Project Gallery Images (Conceptual architectural representations)
+-- Project Gallery Images (Actual Project Elevations & Views)
 INSERT IGNORE INTO `project_images` (`id`, `project_id`, `image_url`, `alt_text`, `caption`, `sort_order`) VALUES
-(1, 1, '/images/project-commercial-plaza.jpg', 'Orion One32 architectural elevation concept', 'Conceptual architectural representation — verify actual site photographs during consultation', 1),
-(2, 1, '/images/category-commercial.jpg', 'Modern Grade-A commercial facade concept', 'Conceptual exterior facade representation', 2),
-(3, 1, '/images/category-prerented.jpg', 'High-street retail promenade concept', 'Conceptual retail boulevard ambiance', 3),
-(4, 2, '/images/category-commercial.jpg', 'Onyx by Splendor commercial tower concept', 'Conceptual architectural representation — verify actual site photographs during consultation', 1),
-(5, 2, '/images/project-commercial-plaza.jpg', 'Corporate plaza courtyard concept', 'Conceptual business campus layout', 2),
-(6, 3, '/images/project-luxury-residences.jpg', 'ACE Starlit luxury residential towers concept', 'Conceptual architectural representation — verify actual site photographs during consultation', 1),
-(7, 3, '/images/about-interior.jpg', 'Luxury residential living lounge concept', 'Conceptual contemporary interior palette', 2),
-(8, 4, '/images/category-residential.jpg', 'ACE HAN''EI luxury apartments concept', 'Conceptual architectural representation — verify actual site photographs during consultation', 1),
-(9, 4, '/images/about-interior.jpg', 'Spacious family residence interior concept', 'Conceptual living room design', 2),
-(10, 5, '/images/category-prerented.jpg', 'DXN Orion commercial plaza concept', 'Conceptual architectural representation — verify actual site photographs during consultation', 1),
-(11, 5, '/images/category-investment.jpg', 'Yamuna Expressway corridor aerial view', 'Conceptual expressway corridor perspective', 2),
-(12, 6, '/images/category-investment.jpg', 'Gaur Alaris expressway skyline concept', 'Conceptual architectural representation — verify actual site photographs during consultation', 1),
-(13, 6, '/images/project-luxury-residences.jpg', 'Gated residential community gardens concept', 'Conceptual landscaped residential setting', 2);
+(1, 1, '/images/projects/orion-one32.webp', 'Orion One32 Sector 132 Noida Elevation', 'Orion One32 — Sector 132, Noida Expressway Exterior Elevation', 1),
+(2, 1, '/images/projects/orion-one32-2.webp', 'Orion One32 Commercial Tower View', 'Orion One32 — IT/ITES & Commercial Building View', 2),
+(3, 1, '/images/projects/orion-one32-3.webp', 'Orion One32 High Street Retail', 'Orion One32 — European High-Street Retail Promenade', 3),
+(4, 2, '/images/projects/onyx-by-splendor.webp', 'Onyx by Splendor Sector 142 Noida', 'Onyx by Splendor — Sector 142, Noida Elevation', 1),
+(5, 2, '/images/projects/onyx-by-splendor-2.jpg', 'Onyx by Splendor Aerial Site View', 'Onyx by Splendor — Actual Aerial Site & Construction View', 2),
+(6, 3, '/images/projects/ace-starlit.jpg', 'ACE Starlit Sector 152 Noida Elevation', 'ACE Starlit — Sector 152, Noida Signature Glass Facade', 1),
+(7, 3, '/images/projects/ace-hanei.webp', 'ACE Luxury Residences Architecture', 'ACE Group Luxury Architectural Aesthetic', 2),
+(8, 4, '/images/projects/ace-hanei.webp', 'ACE HAN''EI Greater Noida West', 'ACE HAN''EI — Greater Noida West Luxury Residential Elevation', 1),
+(9, 4, '/images/projects/ace-starlit.jpg', 'ACE Residential Facade View', 'ACE Group Contemporary Residential Landscape', 2),
+(10, 5, '/images/projects/dxn-orion.jpg', 'DXN Orion Yamuna Expressway Street View', 'DXN Orion — Yamuna Expressway Towers Street View', 1),
+(11, 5, '/images/projects/dxn-orion-2.jpg', 'DXN Orion Aerial Brochure Perspective', 'DXN Orion — Yamuna Expressway Aerial Master View', 2),
+(12, 6, '/images/projects/gaur-alaris.webp', 'Gaur Alaris Yamuna Expressway Elevation', 'Gaur Alaris — Sector 22D, Yamuna Expressway Elevation', 1),
+(13, 6, '/images/projects/gaur-alaris-2.jpg', 'Gaur Alaris Project View', 'Gaur Alaris — Residential Community Perspective', 2);
 
 -- 9. Properties (Powering Smart Property Search with real DB records)
 INSERT INTO `properties` (

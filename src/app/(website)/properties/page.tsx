@@ -44,7 +44,7 @@ export default async function PropertiesPage({
         badge="Curated Real Estate Directory"
         title="Properties Across Noida, Greater Noida & NCR"
         description="Search residential, commercial, industrial, plotted, pre-rented, and resale consulting opportunities filtered directly from our advisory database."
-        imageUrl="/images/category-residential.jpg"
+        imageUrl="/images/projects/ace-starlit.jpg"
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Properties" }]}
       />
       <PropertiesDirectoryClient

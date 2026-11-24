@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { CheckCircle2, Loader2, Send } from "lucide-react";
+import { CheckCircle2, Loader2, Send, MessageCircle } from "lucide-react";
 
 export default function ContactForm() {
   const [form, setForm] = useState({
@@ -15,6 +15,7 @@ export default function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +32,7 @@ export default function ContactForm() {
         setError(data.error || "Please check all fields and try again.");
       } else {
         setSuccess(data.message || "Your message has been sent.");
+        setWhatsappUrl(data.whatsappUrl || null);
         setForm({
           name: "",
           phone: "",
@@ -55,13 +57,29 @@ export default function ContactForm() {
           Message Received
         </h3>
         <p className="mt-2 text-sm text-[#1C2921]/75">{success}</p>
-        <button
-          type="button"
-          onClick={() => setSuccess(null)}
-          className="mt-5 rounded-lg bg-[#0C3323] px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#E0C796]"
-        >
-          Send Another Message
-        </button>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          {whatsappUrl && (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Also Send on WhatsApp (+91 82875 69844)
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setSuccess(null);
+              setWhatsappUrl(null);
+            }}
+            className="rounded-lg bg-[#0C3323] px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#E0C796]"
+          >
+            Send Another Message
+          </button>
+        </div>
       </div>
     );
   }

@@ -320,6 +320,21 @@ export default function AdminHomepagePage() {
         : [];
       return (
         <div className="space-y-3 rounded-xl border border-[#164B34]/15 bg-[#F6F7F2] p-4">
+          {key === "trust_highlights" && (
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-[#164B34]">
+                Pillars Motto Banner (separate words with |)
+              </label>
+              <input
+                value={String(structured.tagline || "TRUST | TRANSPARENCY | SAFE INVESTMENT")}
+                onChange={(e) =>
+                  updateStructured({ ...structured, tagline: e.target.value })
+                }
+                placeholder="TRUST | TRANSPARENCY | SAFE INVESTMENT"
+                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold tracking-wider"
+              />
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#0C3323]">
               {key === "trust_highlights" ? "Trust & Brand Highlights" : "Why Choose Features"} ({list.length})

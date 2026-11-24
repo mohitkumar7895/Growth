@@ -45,12 +45,12 @@ export default function SiteFooter({
           <div className="col-span-2 lg:col-span-4">
             <Link href="/" className="inline-flex items-center gap-3">
               {settings.logo_url ? (
-                <div className="rounded-xl bg-white/95 px-4 py-2 shadow-md ring-1 ring-[#C6A66C]/45">
+                <div className="rounded-xl bg-white/98 px-4 py-2.5 shadow-lg ring-1 ring-[#C6A66C]/50">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={settings.logo_url}
                     alt={settings.site_name || "Growth Realtech"}
-                    className="h-14 w-auto object-contain"
+                    className="h-16 w-auto object-contain sm:h-20"
                   />
                 </div>
               ) : (
@@ -161,6 +161,15 @@ export default function SiteFooter({
                   className="transition hover:text-[#E0C796]"
                 >
                   {settings.contact_phone || "+91 82875 69844"}
+                </a>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Mail className="h-4 w-4 shrink-0 text-[#C6A66C]" aria-hidden="true" />
+                <a
+                  href={`mailto:${settings.contact_email_secondary || "care@growthrealtech.in"}`}
+                  className="break-all transition hover:text-[#E0C796]"
+                >
+                  {settings.contact_email_secondary || "care@growthrealtech.in"}
                 </a>
               </li>
               <li className="flex items-center gap-2.5">

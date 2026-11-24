@@ -23,7 +23,7 @@ export default async function ServicesPage() {
         badge="Advisory Practice"
         title="Specialized Real Estate Consulting Services"
         description="End-to-end residential, commercial, industrial, land, leasing, resale, and investment advisory tailored to clients across Noida, Greater Noida, and the Yamuna Expressway."
-        imageUrl="/images/category-commercial.jpg"
+        imageUrl="/images/projects/onyx-by-splendor.webp"
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Services" }]}
       />
 

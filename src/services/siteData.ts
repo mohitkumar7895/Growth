@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS: WebsiteSettingsMap = {
   favicon_url: "/images/growth-realtech-logo.png",
   contact_phone: "+91 82875 69844",
   contact_email: "growthrealtechnoida@gmail.com",
+  contact_email_secondary: "care@growthrealtech.in",
   contact_location: "Noida, Uttar Pradesh",
   contact_address: "Noida, Uttar Pradesh, India",
   whatsapp_number: "918287569844",

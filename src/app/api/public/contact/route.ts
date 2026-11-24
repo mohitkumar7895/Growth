@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { execute } from "@/lib/db";
 import { contactSubmissionSchema } from "@/lib/validations";
 import { checkRateLimit, getClientIp, apiError } from "@/lib/security";
+import { sendEnquiryNotificationEmail } from "@/lib/mailer";
+import { getWebsiteSettings } from "@/services/siteData";
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,11 +44,35 @@ export async function POST(req: NextRequest) {
       ]
     );
 
+    const settings = await getWebsiteSettings();
+    const extraEmails = [settings.contact_email, settings.contact_email_secondary].filter(Boolean);
+
+    await sendEnquiryNotificationEmail({
+      subject: `New Contact Message: ${d.subject || "General Advisory"} — ${d.name}`,
+      heading: "New Contact Form Submission",
+      extraRecipients: extraEmails,
+      fields: {
+        "Client Name": d.name,
+        "Phone Number": d.phone,
+        Email: d.email || "Not provided",
+        Subject: d.subject || "General Advisory Inquiry",
+        Location: d.location || "Noida",
+        Message: d.message,
+      },
+    });
+
+    const whatsappNum = (settings.whatsapp_number || "918287569844").replace(/\D/g, "");
+    const whatsappText = `Hello Growth Realtech,\nName: ${d.name}\nPhone: ${d.phone}\nSubject: ${
+      d.subject || "Contact Inquiry"
+    }\nMessage: ${d.message}`;
+
     return NextResponse.json(
       {
         success: true,
         id: result.insertId,
-        message: "Thank you for contacting Growth Realtech. Our team will respond shortly.",
+        whatsappUrl: `https://wa.me/${whatsappNum}?text=${encodeURIComponent(whatsappText)}`,
+        message:
+          "Thank you for contacting Growth Realtech. Your message has been sent to growthrealtechnoida@gmail.com, care@growthrealtech.in & our advisory desk (+91 82875 69844).",
       },
       { status: 201 }
     );

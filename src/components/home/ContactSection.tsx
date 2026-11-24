@@ -19,6 +19,7 @@ export default function ContactSection({
 }) {
   const phone = settings.contact_phone || "+91 82875 69844";
   const email = settings.contact_email || "growthrealtechnoida@gmail.com";
+  const secondaryEmail = settings.contact_email_secondary || "care@growthrealtech.in";
   const location = settings.contact_location || "Noida, Uttar Pradesh";
   const waNum = (settings.whatsapp_number || "918287569844").replace(/\D/g, "");
   const waHref = `https://wa.me/${waNum}?text=${encodeURIComponent(
@@ -66,8 +67,14 @@ export default function ContactSection({
                     Email Correspondence
                   </p>
                   <a
-                    href={`mailto:${email}`}
+                    href={`mailto:${secondaryEmail}`}
                     className="block break-all text-xs font-semibold text-[#0C3323] hover:text-[#164B34] sm:text-sm"
+                  >
+                    {secondaryEmail}
+                  </a>
+                  <a
+                    href={`mailto:${email}`}
+                    className="mt-0.5 block break-all text-xs font-medium text-[#1C2921]/80 hover:text-[#164B34] sm:text-sm"
                   >
                     {email}
                   </a>

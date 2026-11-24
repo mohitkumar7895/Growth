@@ -21,7 +21,7 @@ export default async function ContactPage() {
         badge="Connect With Growth Realtech"
         title="Schedule a Private Real Estate Consultation"
         description={`Reach our advisory desk in ${settings.contact_location || "Noida, Uttar Pradesh"} via phone, WhatsApp, email, or the structured consultation form below.`}
-        imageUrl="/images/hero-skyline.jpg"
+        imageUrl="/images/projects/ace-hanei.webp"
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Contact Us" }]}
       />
 

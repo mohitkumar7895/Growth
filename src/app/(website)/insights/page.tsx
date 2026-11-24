@@ -30,7 +30,7 @@ export default async function InsightsPage({
         badge="Real Estate Insights & Research"
         title="Market Perspectives & Buying Guides"
         description="Practical articles on Noida property updates, Yamuna Expressway corridors, UP-RERA verification, commercial real estate, and prudent investment diligence."
-        imageUrl="/images/category-investment.jpg"
+        imageUrl="/images/projects/gaur-alaris.webp"
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Insights" }]}
       />
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { CheckCircle2, Loader2, Send } from "lucide-react";
+import { CheckCircle2, Loader2, Send, MessageCircle } from "lucide-react";
 import { BUDGET_RANGES, LOCATIONS, PURPOSES } from "@/types";
 
 interface EnquiryFormProps {
@@ -41,6 +41,7 @@ export default function EnquiryForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +66,7 @@ export default function EnquiryForm({
           data.message ||
             "Thank you! Our Growth Realtech advisory team will contact you shortly."
         );
+        setWhatsappUrl(data.whatsappUrl || null);
         setForm({
           name: "",
           phone: "",
@@ -101,13 +103,29 @@ export default function EnquiryForm({
         <p className={`mt-2 text-sm ${dark ? "text-white/80" : "text-[#1C2921]/75"}`}>
           {successMsg}
         </p>
-        <button
-          type="button"
-          onClick={() => setSuccessMsg(null)}
-          className="mt-6 inline-flex items-center gap-2 rounded-lg border border-[#C6A66C] px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#C6A66C] transition hover:bg-[#C6A66C] hover:text-[#0C3323]"
-        >
-          Submit Another Request
-        </button>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          {whatsappUrl && (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-md transition hover:brightness-105"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Also Send on WhatsApp (+91 82875 69844)
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setSuccessMsg(null);
+              setWhatsappUrl(null);
+            }}
+            className="inline-flex items-center gap-2 rounded-lg border border-[#C6A66C] px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#C6A66C] transition hover:bg-[#C6A66C] hover:text-[#0C3323]"
+          >
+            Submit Another Request
+          </button>
+        </div>
       </div>
     );
   }

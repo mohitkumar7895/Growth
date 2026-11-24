@@ -124,8 +124,8 @@ export default function FeaturedProjectsSection({
                       {project.region_filter}
                     </span>
                   </div>
-                  <p className="absolute bottom-2.5 left-4 right-4 text-[10px] text-white/75">
-                    Architectural concept visual • Verify actual site details on visit
+                  <p className="absolute bottom-2.5 left-4 right-4 text-[10px] text-white/85">
+                    Project Elevation • Confirm latest site status &amp; RERA on consultation
                   </p>
                 </div>
 

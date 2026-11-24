@@ -33,7 +33,7 @@ export default async function ApproachPage() {
           approach?.description ||
           "How Growth Realtech moves from understanding your brief to coordinating well-evaluated real estate decisions."
         }
-        imageUrl="/images/hero-skyline.jpg"
+        imageUrl="/images/projects/dxn-orion.jpg"
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Our Approach" }]}
       />
 

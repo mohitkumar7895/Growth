@@ -27,7 +27,7 @@ export default function PageHeroBanner({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="absolute inset-0 z-0 opacity-25">
+      <div className="absolute inset-0 z-0">
         <Image
           src={imageUrl}
           alt={title}
@@ -35,16 +35,17 @@ export default function PageHeroBanner({
           priority
           fetchPriority="high"
           sizes="100vw"
-          className="object-cover"
+          className="object-cover object-center opacity-85"
         />
       </div>
       <div
         className="absolute inset-0 z-[1]"
         style={{
           background:
-            "linear-gradient(110deg, rgba(12,51,35,0.95) 0%, rgba(22,75,52,0.82) 60%, rgba(12,51,35,0.92) 100%)",
+            "linear-gradient(105deg, rgba(12,51,35,0.82) 0%, rgba(12,51,35,0.48) 55%, rgba(12,51,35,0.34) 100%)",
         }}
       />
+      <div className="absolute inset-x-0 bottom-0 z-[1] h-24 bg-gradient-to-t from-[#0C3323]/80 to-transparent" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <nav aria-label="Breadcrumb" className="mb-5">

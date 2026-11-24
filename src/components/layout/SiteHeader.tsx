@@ -73,8 +73,15 @@ export default function SiteHeader({
                 <span>{settings.contact_phone || "+91 82875 69844"}</span>
               </a>
               <a
-                href={`mailto:${settings.contact_email || "growthrealtechnoida@gmail.com"}`}
+                href={`mailto:${settings.contact_email_secondary || "care@growthrealtech.in"}`}
                 className="hidden items-center gap-1.5 transition hover:text-[#E0C796] md:inline-flex"
+              >
+                <Mail className="h-3.5 w-3.5 shrink-0 text-[#C6A66C]" aria-hidden="true" />
+                <span>{settings.contact_email_secondary || "care@growthrealtech.in"}</span>
+              </a>
+              <a
+                href={`mailto:${settings.contact_email || "growthrealtechnoida@gmail.com"}`}
+                className="hidden items-center gap-1.5 transition hover:text-[#E0C796] lg:inline-flex"
               >
                 <Mail className="h-3.5 w-3.5 shrink-0 text-[#C6A66C]" aria-hidden="true" />
                 <span>{settings.contact_email || "growthrealtechnoida@gmail.com"}</span>
@@ -91,16 +98,16 @@ export default function SiteHeader({
       )}
 
       {/* Main Sticky Navigation Bar */}
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2.5 sm:px-6 sm:py-3 lg:px-8">
-        {/* Brand Logo */}
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2 sm:px-6 sm:py-2.5 lg:px-8">
+        {/* Brand Logo (Larger, High-Impact Display) */}
         <Link href="/" className="group flex shrink-0 items-center gap-3">
           {settings.logo_url ? (
-            <div className="flex items-center rounded-xl bg-white/95 px-2.5 py-1 shadow-md ring-1 ring-[#C6A66C]/45 transition group-hover:bg-white group-hover:ring-[#E0C796] sm:px-3 sm:py-1.5">
+            <div className="flex items-center rounded-xl bg-white/98 px-3 py-1.5 shadow-lg ring-1 ring-[#C6A66C]/55 transition group-hover:bg-white group-hover:ring-[#E0C796] sm:px-3.5 sm:py-1.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={settings.logo_url}
                 alt={settings.site_name || "Growth Realtech"}
-                className="h-9 w-auto object-contain sm:h-10 xl:h-11"
+                className="h-12 w-auto object-contain sm:h-14 xl:h-16"
               />
             </div>
           ) : (

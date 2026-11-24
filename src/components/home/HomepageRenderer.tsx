@@ -71,9 +71,17 @@ export default function HomepageRenderer({
 
         if (key === "trust_highlights") {
           const data = safeJsonParse<{
+            tagline?: string;
             items?: { icon: string; title: string; description: string }[];
           }>(section.content_json, {});
           const items = data.items || [];
+          const pillarsTagline = (
+            data.tagline || "TRUST | TRANSPARENCY | SAFE INVESTMENT"
+          )
+            .split("|")
+            .map((s) => s.trim())
+            .filter(Boolean);
+
           return (
             <section key={section.id} className="bg-white py-9 sm:py-14 lg:py-16">
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -84,7 +92,25 @@ export default function HomepageRenderer({
                   description={section.description}
                   align="center"
                 />
-                <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-10 sm:gap-5 lg:grid-cols-4">
+
+                {/* Core Pillars Motto Ribbon: TRUST | TRANSPARENCY | SAFE INVESTMENT */}
+                <div className="mx-auto mt-6 flex max-w-3xl flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-xl border border-[#164B34]/15 bg-[#F6F7F2] px-5 py-3.5 text-center sm:gap-x-7 sm:py-4">
+                  {pillarsTagline.map((word, idx) => (
+                    <React.Fragment key={idx}>
+                      {idx > 0 && (
+                        <span
+                          aria-hidden="true"
+                          className="h-4 w-[1.5px] bg-[#164B34]/60"
+                        />
+                      )}
+                      <span className="text-xs font-bold uppercase tracking-[0.26em] text-[#0C3323] sm:text-sm sm:tracking-[0.3em]">
+                        {word}
+                      </span>
+                    </React.Fragment>
+                  ))}
+                </div>
+
+                <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:gap-5 lg:grid-cols-4">
                   {items.map((item, idx) => (
                     <Reveal key={idx} delay={idx * 0.05}>
                       <div className="group h-full rounded-2xl border border-[#164B34]/12 bg-[#F6F7F2] p-4 transition duration-300 hover:-translate-y-1 hover:border-[#C6A66C] hover:bg-white hover:shadow-xl sm:p-6">

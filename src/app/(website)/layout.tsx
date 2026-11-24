@@ -46,6 +46,7 @@ export default async function WebsiteLayout({
         whatsappNumber={settings.whatsapp_number || "918287569844"}
         whatsappMessage={settings.whatsapp_default_message || ""}
         phone={settings.contact_phone || "+91 82875 69844"}
+        logoUrl={settings.logo_url || "/images/growth-realtech-logo.png"}
       />
     </div>
   );

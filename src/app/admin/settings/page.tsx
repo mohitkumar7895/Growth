@@ -138,10 +138,19 @@ export default function AdminSettingsPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold text-[#164B34]">Email Address</label>
+                <label className="mb-1 block text-xs font-semibold text-[#164B34]">Primary Email (Leads &amp; Contact)</label>
                 <input
                   value={settings.contact_email || ""}
                   onChange={(e) => setVal("contact_email", e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-[#164B34]">Official Care Email (care@growthrealtech.in)</label>
+                <input
+                  value={settings.contact_email_secondary || ""}
+                  onChange={(e) => setVal("contact_email_secondary", e.target.value)}
+                  placeholder="care@growthrealtech.in"
                   className="w-full rounded-lg border border-gray-200 px-3.5 py-2 text-sm"
                 />
               </div>
