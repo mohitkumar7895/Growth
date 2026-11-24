@@ -20,7 +20,7 @@ export default async function ProjectsPage() {
         badge="Curated Developments"
         title="Featured Projects Across Noida, Greater Noida & Yamuna Expressway"
         description="Explore prominent commercial and residential reference projects. Official pricing, unit configurations, and UP-RERA disclosures are verified during your consultation."
-        imageUrl="/images/projects/orion-one32.webp"
+        imageUrl="/images/projects/orion-one32.jpg"
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Projects" }]}
       />
       <FeaturedProjectsSection

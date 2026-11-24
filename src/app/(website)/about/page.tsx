@@ -95,40 +95,22 @@ export default async function AboutPage() {
               </div>
             </div>
 
-            {aboutData.commitment && (
-              <div className="rounded-2xl bg-[#0C3323] p-6 text-white">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#C6A66C]">
-                  Our Commitment
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-white/85">
+            <div className="rounded-2xl border border-[#C6A66C]/35 bg-[#0C3323] p-6 text-white shadow-lg sm:p-7">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#C6A66C]">
+                Our Commitment
+              </p>
+              <p className="mt-2.5 font-editorial text-2xl font-semibold uppercase tracking-wide text-[#E0C796] sm:text-3xl">
+                Real Estate Solutions for Better Tomorrow
+              </p>
+              <p className="mt-1.5 text-xs font-bold uppercase tracking-[0.24em] text-white sm:text-sm">
+                Your Growth Our Commitment
+              </p>
+              {aboutData.commitment && (
+                <p className="mt-3.5 border-t border-white/15 pt-3.5 text-sm leading-relaxed text-white/85">
                   {aboutData.commitment}
                 </p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Official Brand Identity & Consultant Card */}
-        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="overflow-hidden rounded-2xl border border-[#C6A66C]/40 bg-[#0C3323] shadow-xl">
-            <Image
-              src="/images/branding/brand-solutions-banner.jpg"
-              alt="Growth Realtech — Real Estate Solutions for a Better Tomorrow"
-              width={1024}
-              height={576}
-              loading="lazy"
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <div className="overflow-hidden rounded-2xl border border-[#C6A66C]/40 bg-white shadow-xl">
-            <Image
-              src="/images/branding/brand-card-ankita.jpg"
-              alt="Growth Realtech — Ankita Gupta Real Estate Consultant"
-              width={1024}
-              height={576}
-              loading="lazy"
-              className="h-full w-full object-cover"
-            />
+              )}
+            </div>
           </div>
         </div>
 

@@ -310,30 +310,6 @@ export default function HomepageRenderer({
                     </div>
                   </div>
                 </div>
-
-                {/* Official Growth Realtech Brand Showcase Strip */}
-                <div className="mt-8 grid grid-cols-1 gap-4 border-t border-white/15 pt-8 sm:mt-10 sm:grid-cols-2 sm:gap-6">
-                  <div className="overflow-hidden rounded-2xl border border-[#C6A66C]/35 bg-[#082418] shadow-xl">
-                    <Image
-                      src="/images/branding/brand-solutions-banner.jpg"
-                      alt="Growth Realtech — Real Estate Solutions for a Better Tomorrow"
-                      width={1024}
-                      height={576}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="overflow-hidden rounded-2xl border border-[#C6A66C]/35 bg-white shadow-xl">
-                    <Image
-                      src="/images/branding/brand-card-ankita.jpg"
-                      alt="Growth Realtech — Ankita Gupta Real Estate Consultant Noida"
-                      width={1024}
-                      height={576}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                </div>
               </div>
             </section>
           );
