@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -29,35 +29,42 @@ import {
   X,
 } from "lucide-react";
 import type { AdminSessionUser } from "@/lib/auth";
+import {
+  installAdminFetchCache,
+  invalidateAdminApiCache,
+  prefetchAdminApi,
+} from "@/lib/adminCache";
+import TopProgressBar from "@/components/common/TopProgressBar";
 
 interface NavItem {
   label: string;
   href: string;
+  apiUrl: string;
   icon: React.ComponentType<{ className?: string }>;
   permission?: string;
   group: string;
 }
 
 const ADMIN_NAV: NavItem[] = [
-  { label: "Dashboard", href: "/admin", icon: LayoutDashboard, permission: "dashboard.view", group: "Overview" },
-  { label: "Customer Registrations", href: "/admin/customers", icon: UserCheck, permission: "enquiries.manage", group: "Leads & CRM" },
-  { label: "Enquiries CRM", href: "/admin/enquiries", icon: Inbox, permission: "enquiries.manage", group: "Leads & CRM" },
-  { label: "Contact Requests", href: "/admin/contacts", icon: Mail, permission: "contacts.manage", group: "Leads & CRM" },
-  { label: "Homepage & About", href: "/admin/homepage", icon: Home, permission: "homepage.manage", group: "Website CMS" },
-  { label: "Navigation Menus", href: "/admin/navigation", icon: Navigation, permission: "navigation.manage", group: "Website CMS" },
-  { label: "Properties", href: "/admin/properties", icon: Building, permission: "properties.manage", group: "Real Estate" },
-  { label: "Featured Projects", href: "/admin/projects", icon: Building2, permission: "projects.manage", group: "Real Estate" },
-  { label: "Categories", href: "/admin/categories", icon: FolderKanban, permission: "categories.manage", group: "Real Estate" },
-  { label: "Services", href: "/admin/services", icon: Briefcase, permission: "services.manage", group: "Real Estate" },
-  { label: "Blogs & Insights", href: "/admin/blogs", icon: FileText, permission: "blogs.manage", group: "Editorial" },
-  { label: "Testimonials", href: "/admin/testimonials", icon: MessageSquareQuote, permission: "testimonials.manage", group: "Editorial" },
-  { label: "FAQs", href: "/admin/faqs", icon: HelpCircle, permission: "faqs.manage", group: "Editorial" },
-  { label: "Media Library", href: "/admin/media", icon: ImageIcon, permission: "media.manage", group: "Assets & SEO" },
-  { label: "SEO & Sitemap", href: "/admin/seo", icon: Search, permission: "seo.manage", group: "Assets & SEO" },
-  { label: "Legal Pages", href: "/admin/legal", icon: Scale, permission: "legal.manage", group: "Assets & SEO" },
-  { label: "Settings & Appearance", href: "/admin/settings", icon: Settings, permission: "settings.manage", group: "System" },
-  { label: "Users & Roles", href: "/admin/users", icon: Users, permission: "users.manage", group: "System" },
-  { label: "Activity Logs", href: "/admin/logs", icon: ScrollText, permission: "logs.view", group: "System" },
+  { label: "Dashboard", href: "/admin", apiUrl: "/api/admin/dashboard", icon: LayoutDashboard, permission: "dashboard.view", group: "Overview" },
+  { label: "Customer Registrations", href: "/admin/customers", apiUrl: "/api/admin/customers", icon: UserCheck, permission: "enquiries.manage", group: "Leads & CRM" },
+  { label: "Enquiries CRM", href: "/admin/enquiries", apiUrl: "/api/admin/enquiries", icon: Inbox, permission: "enquiries.manage", group: "Leads & CRM" },
+  { label: "Contact Requests", href: "/admin/contacts", apiUrl: "/api/admin/contacts", icon: Mail, permission: "contacts.manage", group: "Leads & CRM" },
+  { label: "Homepage & About", href: "/admin/homepage", apiUrl: "/api/admin/homepage", icon: Home, permission: "homepage.manage", group: "Website CMS" },
+  { label: "Navigation Menus", href: "/admin/navigation", apiUrl: "/api/admin/navigation", icon: Navigation, permission: "navigation.manage", group: "Website CMS" },
+  { label: "Properties", href: "/admin/properties", apiUrl: "/api/admin/properties", icon: Building, permission: "properties.manage", group: "Real Estate" },
+  { label: "Featured Projects", href: "/admin/projects", apiUrl: "/api/admin/projects", icon: Building2, permission: "projects.manage", group: "Real Estate" },
+  { label: "Categories", href: "/admin/categories", apiUrl: "/api/admin/categories", icon: FolderKanban, permission: "categories.manage", group: "Real Estate" },
+  { label: "Services", href: "/admin/services", apiUrl: "/api/admin/services", icon: Briefcase, permission: "services.manage", group: "Real Estate" },
+  { label: "Blogs & Insights", href: "/admin/blogs", apiUrl: "/api/admin/blogs", icon: FileText, permission: "blogs.manage", group: "Editorial" },
+  { label: "Testimonials", href: "/admin/testimonials", apiUrl: "/api/admin/testimonials", icon: MessageSquareQuote, permission: "testimonials.manage", group: "Editorial" },
+  { label: "FAQs", href: "/admin/faqs", apiUrl: "/api/admin/faqs", icon: HelpCircle, permission: "faqs.manage", group: "Editorial" },
+  { label: "Media Library", href: "/admin/media", apiUrl: "/api/admin/media", icon: ImageIcon, permission: "media.manage", group: "Assets & SEO" },
+  { label: "SEO & Sitemap", href: "/admin/seo", apiUrl: "/api/admin/seo", icon: Search, permission: "seo.manage", group: "Assets & SEO" },
+  { label: "Legal Pages", href: "/admin/legal", apiUrl: "/api/admin/legal", icon: Scale, permission: "legal.manage", group: "Assets & SEO" },
+  { label: "Settings & Appearance", href: "/admin/settings", apiUrl: "/api/admin/settings", icon: Settings, permission: "settings.manage", group: "System" },
+  { label: "Users & Roles", href: "/admin/users", apiUrl: "/api/admin/users", icon: Users, permission: "users.manage", group: "System" },
+  { label: "Activity Logs", href: "/admin/logs", apiUrl: "/api/admin/logs", icon: ScrollText, permission: "logs.view", group: "System" },
 ];
 
 export default function AdminShell({
@@ -75,10 +82,6 @@ export default function AdminShell({
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  if (pathname === "/admin/login") {
-    return <>{children}</>;
-  }
-
   const canSee = (perm?: string) => {
     if (!perm) return true;
     if (admin.roleSlug === "super_admin") return true;
@@ -88,7 +91,47 @@ export default function AdminShell({
   const visibleItems = ADMIN_NAV.filter((i) => canSee(i.permission));
   const groups = Array.from(new Set(visibleItems.map((i) => i.group)));
 
+  // Install ultra-fast in-memory SWR cache for /api/admin/* + warm key tabs in background
+  useEffect(() => {
+    if (pathname === "/admin/login") return;
+    const uninstall = installAdminFetchCache();
+
+    const warmTimer = setTimeout(() => {
+      const priorityHrefs = [
+        "/admin",
+        "/admin/customers",
+        "/admin/enquiries",
+        "/admin/homepage",
+        "/admin/projects",
+        "/admin/properties",
+        "/admin/settings",
+      ];
+      for (const item of visibleItems) {
+        if (priorityHrefs.includes(item.href)) {
+          router.prefetch(item.href);
+          prefetchAdminApi(item.apiUrl);
+        }
+      }
+    }, 350);
+
+    return () => {
+      clearTimeout(warmTimer);
+      uninstall();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
+  const handlePrefetch = (item: NavItem) => {
+    router.prefetch(item.href);
+    prefetchAdminApi(item.apiUrl);
+  };
+
   const handleLogout = async () => {
+    invalidateAdminApiCache();
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/admin/login");
     router.refresh();
@@ -97,7 +140,7 @@ export default function AdminShell({
   const sidebarContent = (
     <div className="flex h-full flex-col bg-[#0C3323] text-white">
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3.5">
-        <Link href="/admin" className="flex items-center gap-2.5">
+        <Link href="/admin" prefetch={true} className="flex items-center gap-2.5">
           {logoUrl ? (
             <div className="rounded-lg bg-white/95 px-2.5 py-1 shadow-sm ring-1 ring-[#C6A66C]/40">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -142,8 +185,11 @@ export default function AdminShell({
                     <li key={item.href}>
                       <Link
                         href={item.href}
+                        prefetch={true}
+                        onMouseEnter={() => handlePrefetch(item)}
+                        onFocus={() => handlePrefetch(item)}
                         onClick={() => setSidebarOpen(false)}
-                        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-medium transition ${
+                        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-medium transition-colors duration-100 ${
                           active
                             ? "bg-[#164B34] text-[#E0C796] shadow-sm ring-1 ring-[#C6A66C]/40"
                             : "text-white/75 hover:bg-white/5 hover:text-white"
@@ -178,6 +224,10 @@ export default function AdminShell({
 
   return (
     <div className="flex min-h-screen bg-[#F3F5F0]">
+      <Suspense fallback={null}>
+        <TopProgressBar />
+      </Suspense>
+
       {/* Desktop Sidebar */}
       <aside className="hidden w-64 shrink-0 lg:block">{sidebarContent}</aside>
 

@@ -66,7 +66,7 @@ export default function AdminHomepagePage() {
   };
 
   const load = async (keepId?: number) => {
-    setLoading(true);
+    if (sections.length === 0) setLoading(true);
     const res = await fetch("/api/admin/homepage");
     const data = await res.json();
     const list = (data.sections || []) as HomepageSection[];

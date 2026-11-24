@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query, execute } from "@/lib/db";
-import { requireAdmin, hashPassword, logActivity } from "@/lib/auth";
+import { requireAdmin, hashPassword, logActivity, clearAdminAuthCache } from "@/lib/auth";
 import { apiError, getClientIp } from "@/lib/security";
 
 export async function GET() {
@@ -83,6 +83,7 @@ export async function PUT(req: NextRequest) {
           [roleId, Number(pid)]
         );
       }
+      clearAdminAuthCache();
       await logActivity({
         adminId: admin.id,
         adminName: admin.name,
@@ -111,6 +112,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    clearAdminAuthCache(id);
     await logActivity({
       adminId: admin.id,
       adminName: admin.name,
@@ -135,6 +137,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "You cannot delete your own active account" }, { status: 400 });
     }
     await execute("DELETE FROM admins WHERE id = ?", [id]);
+    clearAdminAuthCache(id);
     await logActivity({
       adminId: admin.id,
       adminName: admin.name,

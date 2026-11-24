@@ -141,9 +141,10 @@ export default function SiteHeader({
                 <li key={item.id}>
                   <Link
                     href={item.url}
+                    prefetch={true}
                     target={item.target || "_self"}
                     aria-current={isActive ? "page" : undefined}
-                    className={`relative whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium tracking-wide transition ${
+                    className={`relative whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium tracking-wide transition-colors duration-100 ${
                       isActive
                         ? "text-[#E0C796] after:absolute after:inset-x-3 after:bottom-0.5 after:h-[2px] after:bg-[#C6A66C]"
                         : "text-white/85 hover:text-[#E0C796]"

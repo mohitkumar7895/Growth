@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import {
   getWebsiteSettings,
   getNavigationMenus,
@@ -8,7 +8,7 @@ import {
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 import FloatingActions from "@/components/common/FloatingActions";
-import PageLoader from "@/components/common/PageLoader";
+import TopProgressBar from "@/components/common/TopProgressBar";
 
 export const dynamic = "force-dynamic";
 
@@ -28,12 +28,9 @@ export default async function WebsiteLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      {settings.animations_enabled !== "false" && (
-        <PageLoader
-          brandName={settings.site_name}
-          logoUrl={settings.logo_url || "/images/growth-realtech-logo.png"}
-        />
-      )}
+      <Suspense fallback={null}>
+        <TopProgressBar />
+      </Suspense>
       <SiteHeader settings={settings} menuItems={headerMenu} />
       <main className="flex-1">{children}</main>
       <SiteFooter

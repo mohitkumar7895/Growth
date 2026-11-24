@@ -24,6 +24,23 @@ export interface AdminSessionUser {
   avatarUrl: string | null;
 }
 
+// Fast in-memory TTL cache for authenticated admin session lookups (eliminates 2 SQL queries per click/API call)
+const ADMIN_AUTH_CACHE_TTL_MS = 60_000;
+declare global {
+  // eslint-disable-next-line no-var
+  var adminAuthCache: Map<number, { user: AdminSessionUser; expiresAt: number }> | undefined;
+}
+const authCache = globalThis.adminAuthCache ?? new Map<number, { user: AdminSessionUser; expiresAt: number }>();
+globalThis.adminAuthCache = authCache;
+
+export function clearAdminAuthCache(adminId?: number) {
+  if (typeof adminId === "number") {
+    authCache.delete(adminId);
+  } else {
+    authCache.clear();
+  }
+}
+
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
@@ -67,11 +84,17 @@ export async function verifySessionToken(
   }
 }
 
+function shouldUseSecureCookie(): boolean {
+  if (process.env.NODE_ENV !== "production") return false;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
+  return siteUrl.startsWith("https://");
+}
+
 export async function setSessionCookie(token: string): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookie(),
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
@@ -82,7 +105,7 @@ export async function clearSessionCookie(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookie(),
     sameSite: "lax",
     path: "/",
     maxAge: 0,
@@ -96,6 +119,12 @@ export async function getCurrentAdmin(): Promise<AdminSessionUser | null> {
 
   const decoded = await verifySessionToken(token);
   if (!decoded) return null;
+
+  const now = Date.now();
+  const cached = authCache.get(decoded.id);
+  if (cached && cached.expiresAt > now) {
+    return cached.user;
+  }
 
   const admin = await queryOne<{
     id: number;
@@ -116,7 +145,10 @@ export async function getCurrentAdmin(): Promise<AdminSessionUser | null> {
     [decoded.id]
   );
 
-  if (!admin) return null;
+  if (!admin) {
+    authCache.delete(decoded.id);
+    return null;
+  }
 
   const permRows = await query<{ slug: string }>(
     `SELECT p.slug
@@ -126,7 +158,7 @@ export async function getCurrentAdmin(): Promise<AdminSessionUser | null> {
     [admin.role_id]
   );
 
-  return {
+  const user: AdminSessionUser = {
     id: admin.id,
     name: admin.name,
     email: admin.email,
@@ -136,6 +168,9 @@ export async function getCurrentAdmin(): Promise<AdminSessionUser | null> {
     permissions: permRows.map((p) => p.slug),
     avatarUrl: admin.avatar_url,
   };
+
+  authCache.set(decoded.id, { user, expiresAt: now + ADMIN_AUTH_CACHE_TTL_MS });
+  return user;
 }
 
 export function hasPermission(
@@ -169,21 +204,20 @@ export async function logActivity(params: {
   details?: string;
   ipAddress?: string | null;
 }): Promise<void> {
-  try {
-    await execute(
-      `INSERT INTO activity_logs (admin_id, admin_name, action, module, entity_id, details, ip_address)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        params.adminId ?? null,
-        params.adminName ?? "System",
-        params.action,
-        params.module,
-        params.entityId != null ? String(params.entityId) : null,
-        params.details ?? null,
-        params.ipAddress ?? null,
-      ]
-    );
-  } catch {
+  // Fire-and-forget non-blocking audit log so Admin Save/Edit/Delete responds immediately
+  void execute(
+    `INSERT INTO activity_logs (admin_id, admin_name, action, module, entity_id, details, ip_address)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [
+      params.adminId ?? null,
+      params.adminName ?? "System",
+      params.action,
+      params.module,
+      params.entityId != null ? String(params.entityId) : null,
+      params.details ?? null,
+      params.ipAddress ?? null,
+    ]
+  ).catch(() => {
     // Non-blocking audit logging
-  }
+  });
 }

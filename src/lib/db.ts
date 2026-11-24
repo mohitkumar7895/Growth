@@ -12,10 +12,10 @@ const poolConfig: mysql.PoolOptions = {
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_NAME || "growth",
   waitForConnections: true,
-  connectionLimit: 12,
-  maxIdle: 6,
+  connectionLimit: 24,
+  maxIdle: 12,
   idleTimeout: 60_000,
-  queueLimit: 50,
+  queueLimit: 100,
   connectTimeout: 5000,
   enableKeepAlive: true,
   keepAliveInitialDelay: 10_000,
@@ -25,9 +25,7 @@ const poolConfig: mysql.PoolOptions = {
 export const db: mysql.Pool =
   globalThis.mysqlPool ?? mysql.createPool(poolConfig);
 
-if (process.env.NODE_ENV !== "production") {
-  globalThis.mysqlPool = db;
-}
+globalThis.mysqlPool = db;
 
 export async function query<T = unknown>(
   sql: string,
