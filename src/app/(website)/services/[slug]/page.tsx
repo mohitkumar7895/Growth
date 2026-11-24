@@ -9,7 +9,7 @@ import { safeJsonParse } from "@/lib/security";
 import PageHeroBanner from "@/components/common/PageHeroBanner";
 import EnquiryForm from "@/components/common/EnquiryForm";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,

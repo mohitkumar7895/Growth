@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Phone,
   Mail,
@@ -22,8 +22,22 @@ export default function SiteHeader({
   menuItems: NavigationItem[];
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Eagerly prefetch all header routes right after mount so every click opens instantly (0ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      for (const item of menuItems) {
+        if (item.url && item.url.startsWith("/") && !item.url.includes("#")) {
+          router.prefetch(item.url);
+        }
+      }
+    }, 150);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isHome = pathname === "/";
   const transparentMode =

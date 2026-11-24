@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getWebsiteSettings } from "@/services/siteData";
 import CustomerRegistrationForm from "@/components/register/CustomerRegistrationForm";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Customer Registration | Growth Realtech",

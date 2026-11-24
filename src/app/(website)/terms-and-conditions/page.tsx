@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getLegalPage } from "@/services/siteData";
 import PageHeroBanner from "@/components/common/PageHeroBanner";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getLegalPage("terms-and-conditions");

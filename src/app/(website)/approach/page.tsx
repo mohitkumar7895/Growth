@@ -8,7 +8,7 @@ import { safeJsonParse } from "@/lib/security";
 import PageHeroBanner from "@/components/common/PageHeroBanner";
 import ApproachTimeline from "@/components/home/ApproachTimeline";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata("approach", { path: "/approach" });

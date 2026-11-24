@@ -18,7 +18,7 @@ import PageHeroBanner from "@/components/common/PageHeroBanner";
 import ProjectGalleryClient from "@/components/projects/ProjectGalleryClient";
 import EnquiryForm from "@/components/common/EnquiryForm";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,

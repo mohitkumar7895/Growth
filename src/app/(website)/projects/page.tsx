@@ -5,7 +5,7 @@ import { buildPageMetadata } from "@/lib/seo";
 import PageHeroBanner from "@/components/common/PageHeroBanner";
 import FeaturedProjectsSection from "@/components/home/FeaturedProjectsSection";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata("projects", { path: "/projects" });

@@ -6,7 +6,7 @@ import PageHeroBanner from "@/components/common/PageHeroBanner";
 import ContactSection from "@/components/home/ContactSection";
 import ContactForm from "@/components/common/ContactForm";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata("contact", { path: "/contact" });

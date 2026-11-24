@@ -91,31 +91,41 @@ export default function AdminShell({
   const visibleItems = ADMIN_NAV.filter((i) => canSee(i.permission));
   const groups = Array.from(new Set(visibleItems.map((i) => i.group)));
 
-  // Install ultra-fast in-memory SWR cache for /api/admin/* + warm key tabs in background
+  // Install ultra-fast in-memory SWR cache for /api/admin/* + prefetch ALL visible Admin routes immediately
   useEffect(() => {
     if (pathname === "/admin/login") return;
     const uninstall = installAdminFetchCache();
 
-    const warmTimer = setTimeout(() => {
+    // Immediately prefetch all visible sidebar Next.js route chunks so any click switches in 0ms
+    const routeTimer = setTimeout(() => {
+      for (const item of visibleItems) {
+        router.prefetch(item.href);
+      }
+    }, 100);
+
+    // Gently pre-warm top Admin API JSON payloads in RAM
+    const apiTimer = setTimeout(() => {
       const priorityHrefs = [
         "/admin",
         "/admin/customers",
         "/admin/enquiries",
+        "/admin/contacts",
         "/admin/homepage",
         "/admin/projects",
         "/admin/properties",
+        "/admin/services",
         "/admin/settings",
       ];
       for (const item of visibleItems) {
         if (priorityHrefs.includes(item.href)) {
-          router.prefetch(item.href);
           prefetchAdminApi(item.apiUrl);
         }
       }
-    }, 350);
+    }, 250);
 
     return () => {
-      clearTimeout(warmTimer);
+      clearTimeout(routeTimer);
+      clearTimeout(apiTimer);
       uninstall();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

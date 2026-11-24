@@ -10,7 +10,7 @@ import SiteFooter from "@/components/layout/SiteFooter";
 import FloatingActions from "@/components/common/FloatingActions";
 import TopProgressBar from "@/components/common/TopProgressBar";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function WebsiteLayout({
   children,

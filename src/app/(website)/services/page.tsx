@@ -8,7 +8,7 @@ import { buildPageMetadata } from "@/lib/seo";
 import PageHeroBanner from "@/components/common/PageHeroBanner";
 import { DynamicIcon } from "@/components/common/IconRenderer";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata("services", { path: "/services" });
