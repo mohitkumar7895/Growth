@@ -145,12 +145,13 @@ export default function SiteHeader({
 
         {/* Single Semantic Primary Navigation */}
         <nav aria-label="Primary" className="flex items-center gap-2">
-          <ul className="hidden items-center gap-0.5 xl:flex">
+          <ul className="hidden items-center gap-0.5 lg:flex">
             {regularLinks.map((item) => {
               const isActive =
                 item.url === "/"
                   ? pathname === "/"
                   : pathname.startsWith(item.url);
+              const isRegister = item.url === "/register";
               return (
                 <li key={item.id}>
                   <Link
@@ -158,9 +159,13 @@ export default function SiteHeader({
                     prefetch={true}
                     target={item.target || "_self"}
                     aria-current={isActive ? "page" : undefined}
-                    className={`relative whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium tracking-wide transition-colors duration-100 ${
-                      isActive
-                        ? "text-[#E0C796] after:absolute after:inset-x-3 after:bottom-0.5 after:h-[2px] after:bg-[#C6A66C]"
+                    className={`relative whitespace-nowrap rounded-md px-2 py-2 text-[12px] font-medium tracking-wide transition-colors duration-100 xl:px-3 xl:text-[13px] ${
+                      isRegister
+                        ? isActive
+                          ? "border border-[#C6A66C] bg-[#C6A66C]/20 text-[#E0C796]"
+                          : "border border-[#C6A66C]/55 bg-white/5 text-[#E0C796] hover:border-[#E0C796] hover:bg-[#C6A66C]/15"
+                        : isActive
+                        ? "text-[#E0C796] after:absolute after:inset-x-2.5 after:bottom-0.5 after:h-[2px] after:bg-[#C6A66C]"
                         : "text-white/85 hover:text-[#E0C796]"
                     }`}
                   >
@@ -170,11 +175,12 @@ export default function SiteHeader({
               );
             })}
             {ctaLinks.map((cta) => (
-              <li key={cta.id} className="ml-3">
+              <li key={cta.id} className="ml-2 xl:ml-3">
                 <Link
                   href={cta.url}
+                  prefetch={true}
                   target={cta.target || "_self"}
-                  className="gr-btn inline-flex items-center gap-1.5 whitespace-nowrap bg-[var(--gr-gold)] px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-[var(--gr-deep)] shadow-md transition hover:bg-[var(--gr-light-gold)]"
+                  className="gr-btn inline-flex items-center gap-1.5 whitespace-nowrap bg-[var(--gr-gold)] px-3.5 py-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--gr-deep)] shadow-md transition hover:bg-[var(--gr-light-gold)] xl:px-4 xl:py-2.5 xl:text-xs"
                 >
                   <span>{cta.label}</span>
                   <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -183,11 +189,19 @@ export default function SiteHeader({
             ))}
           </ul>
 
-          {/* Tablet Quick CTA + Mobile/Tablet Menu Toggle */}
+          {/* Tablet Quick Register + CTA + Mobile Menu Toggle */}
+          <Link
+            href="/register"
+            prefetch={true}
+            className="gr-btn inline-flex items-center gap-1 border border-[#C6A66C]/65 bg-white/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-[#E0C796] transition hover:bg-[#C6A66C]/20 lg:hidden"
+          >
+            <span>Register</span>
+          </Link>
           {ctaLinks[0] && (
             <Link
               href={ctaLinks[0].url}
-              className="gr-btn hidden items-center gap-1.5 bg-[var(--gr-gold)] px-3.5 py-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--gr-deep)] shadow-sm transition hover:bg-[var(--gr-light-gold)] sm:inline-flex xl:hidden"
+              prefetch={true}
+              className="gr-btn hidden items-center gap-1.5 bg-[var(--gr-gold)] px-3.5 py-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--gr-deep)] shadow-sm transition hover:bg-[var(--gr-light-gold)] sm:inline-flex lg:hidden"
             >
               <span>{ctaLinks[0].label}</span>
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -199,7 +213,7 @@ export default function SiteHeader({
             onClick={() => setMobileOpen((v) => !v)}
             aria-expanded={mobileOpen}
             aria-controls="mobile-site-menu"
-            className="inline-flex min-h-[42px] items-center gap-2 rounded-lg border border-white/25 bg-white/5 px-3.5 py-2 text-xs font-semibold uppercase tracking-wider text-white transition hover:border-[#C6A66C] hover:text-[#E0C796] xl:hidden"
+            className="inline-flex min-h-[42px] items-center gap-2 rounded-lg border border-white/25 bg-white/5 px-3.5 py-2 text-xs font-semibold uppercase tracking-wider text-white transition hover:border-[#C6A66C] hover:text-[#E0C796] lg:hidden"
           >
             {mobileOpen ? (
               <X className="h-4 w-4" aria-hidden="true" />
@@ -215,7 +229,7 @@ export default function SiteHeader({
       {mobileOpen && (
         <div
           id="mobile-site-menu"
-          className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-[#C6A66C]/25 bg-[#0C3323]/98 px-4 pb-6 pt-3 shadow-2xl backdrop-blur-lg xl:hidden"
+          className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-[#C6A66C]/25 bg-[#0C3323]/98 px-4 pb-6 pt-3 shadow-2xl backdrop-blur-lg lg:hidden"
         >
           <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
             {regularLinks.map((item) => {

@@ -102,16 +102,18 @@ INSERT INTO `navigation_menus` (`id`, `label`, `url`, `location`, `sort_order`, 
 (5, 'About Us', '/about', 'header', 5, 1, 0),
 (6, 'Our Approach', '/approach', 'header', 6, 1, 0),
 (7, 'Insights', '/insights', 'header', 7, 1, 0),
-(8, 'Contact', '/contact', 'header', 8, 1, 0),
-(9, 'Enquire Now', '/contact#enquiry', 'header', 9, 1, 1),
+(17, 'Register', '/register', 'header', 8, 1, 0),
+(8, 'Contact', '/contact', 'header', 9, 1, 0),
+(9, 'Enquire Now', '/contact#enquiry', 'header', 10, 1, 1),
 (10, 'Home', '/', 'footer_quick', 1, 1, 0),
 (11, 'Properties', '/properties', 'footer_quick', 2, 1, 0),
 (12, 'Featured Projects', '/projects', 'footer_quick', 3, 1, 0),
 (13, 'About Growth Realtech', '/about', 'footer_quick', 4, 1, 0),
 (14, 'Our Approach', '/approach', 'footer_quick', 5, 1, 0),
 (15, 'Insights & Blogs', '/insights', 'footer_quick', 6, 1, 0),
-(16, 'Contact Us', '/contact', 'footer_quick', 7, 1, 0)
-ON DUPLICATE KEY UPDATE `label` = VALUES(`label`), `url` = VALUES(`url`);
+(16, 'Contact Us', '/contact', 'footer_quick', 7, 1, 0),
+(18, 'Customer Registration', '/register', 'footer_quick', 8, 1, 0)
+ON DUPLICATE KEY UPDATE `label` = VALUES(`label`), `url` = VALUES(`url`), `sort_order` = VALUES(`sort_order`);
 
 -- 6. Homepage Sections (100% database-driven)
 INSERT INTO `homepage_sections` (

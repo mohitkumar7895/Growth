@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { Lock, CheckCircle2, MessageCircle, ArrowUpRight, Loader2 } from "lucide-react";
 
@@ -72,10 +72,12 @@ export default function CustomerRegistrationForm({
   });
 
   const [otp, setOtp] = useState("");
+  const [demoOtpCode, setDemoOtpCode] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(false);
   const [verified, setVerified] = useState(false);
   const [verifiedPhone, setVerifiedPhone] = useState("");
   const [verificationToken, setVerificationToken] = useState("");
+  const otpInputRef = useRef<HTMLInputElement>(null);
 
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
@@ -130,10 +132,12 @@ export default function CustomerRegistrationForm({
         setStatus({ text: data.error || "Unable to send OTP.", type: "error" });
       } else {
         setOtpSent(true);
+        setDemoOtpCode(data.demoOtp || null);
         setStatus({
           text: data.message || "OTP sent. Please check your phone.",
           type: "success",
         });
+        setTimeout(() => otpInputRef.current?.focus(), 60);
       }
     } catch {
       setStatus({ text: "Network error while sending OTP.", type: "error" });
@@ -161,6 +165,7 @@ export default function CustomerRegistrationForm({
         setStatus({ text: data.error || "Invalid OTP.", type: "error" });
       } else {
         setVerified(true);
+        setDemoOtpCode(null);
         setVerifiedPhone(currentFullPhone());
         setVerificationToken(data.verificationToken);
         setStatus({
@@ -412,6 +417,7 @@ export default function CustomerRegistrationForm({
                     Enter OTP
                   </label>
                   <input
+                    ref={otpInputRef}
                     id="reg-otp"
                     inputMode="numeric"
                     maxLength={6}
@@ -441,6 +447,21 @@ export default function CustomerRegistrationForm({
                   Verify
                 </button>
               </div>
+
+              {demoOtpCode && !verified && (
+                <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-dashed border-[#286044]/40 bg-[#edf7ef] px-3 py-2 text-xs text-[#123528]">
+                  <span>
+                    Verification OTP: <strong className="tracking-widest">{demoOtpCode}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setOtp(demoOtpCode)}
+                    className="rounded-md bg-[#123528] px-2.5 py-1 text-[11px] font-bold text-white hover:bg-[#286044]"
+                  >
+                    Auto-Fill OTP
+                  </button>
+                </div>
+              )}
 
               {verified && (
                 <div className="mt-2 inline-flex items-center gap-1.5 text-xs font-extrabold text-[#277044]">

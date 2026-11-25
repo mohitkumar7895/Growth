@@ -1,5 +1,6 @@
 import React from "react";
-import { Phone, Mail, MapPin, MessageCircle, Clock } from "lucide-react";
+import Link from "next/link";
+import { Phone, Mail, MapPin, MessageCircle, Clock, UserCheck, ArrowUpRight } from "lucide-react";
 import type { WebsiteSettingsMap } from "@/types";
 import { SectionHeader } from "@/components/animations/Reveal";
 import EnquiryForm from "@/components/common/EnquiryForm";
@@ -127,6 +128,15 @@ export default function ContactSection({
                 <Mail className="h-4 w-4" />
                 Email
               </a>
+              <Link
+                href="/register"
+                prefetch={true}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#C6A66C] px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-[#0C3323] shadow-sm transition hover:bg-[#E0C796] sm:px-5 sm:py-3 sm:text-xs"
+              >
+                <UserCheck className="h-4 w-4" />
+                Customer Registration (OTP)
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
 
             {/* Embedded Google Map */}
