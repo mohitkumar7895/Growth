@@ -147,3 +147,107 @@ export async function sendOtpEmail(params: {
     return { delivered: false, error: errMsg };
   }
 }
+
+export async function sendCustomerThankYouEmail(params: {
+  to: string;
+  name: string;
+  registrationId?: number;
+  phone: string;
+  requirement: string;
+  propertyType: string;
+  preferredLocation: string;
+  budget: string;
+  registrationDate: string;
+  registrationTime: string;
+  advisoryPhone?: string;
+  whatsappUrl?: string;
+}): Promise<{ delivered: boolean; error?: string }> {
+  const transporter = createTransporter();
+  if (!transporter) {
+    return { delivered: false, error: "SMTP credentials not configured" };
+  }
+
+  const refCode = params.registrationId ? `GR-${String(params.registrationId).padStart(4, "0")}` : "Confirmed";
+  const advisoryPhone = params.advisoryPhone || "+91 82875 69844";
+
+  const summaryRows = [
+    ["Registration Ref.", refCode],
+    ["Full Name", params.name],
+    ["Verified Email", `${params.to} ✓`],
+    ["Mobile Number", params.phone],
+    ["Interested In", params.requirement],
+    ["Property Type", params.propertyType],
+    ["Preferred Location", params.preferredLocation],
+    ["Approximate Budget", params.budget],
+    ["Registered On", `${params.registrationDate} at ${params.registrationTime}`],
+  ]
+    .map(
+      ([k, v]) =>
+        `<tr><td style="padding:8px 12px;border:1px solid #e5e7eb;font-weight:600;color:#0C3323;background:#F6F7F2;width:40%;">${escapeHtml(
+          k
+        )}</td><td style="padding:8px 12px;border:1px solid #e5e7eb;color:#1C2921;">${escapeHtml(
+          v
+        )}</td></tr>`
+    )
+    .join("");
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;border:1px solid #C6A66C;border-radius:14px;overflow:hidden;background:#ffffff;">
+      <div style="background:#0C3323;color:#ffffff;padding:24px 26px;text-align:center;">
+        <h2 style="margin:0;color:#E0C796;letter-spacing:0.08em;font-size:20px;">GROWTH REALTECH</h2>
+        <p style="margin:6px 0 0;font-size:11px;letter-spacing:0.16em;color:#ffffffcc;">TRUST • TRANSPARENCY • SAFE INVESTMENT</p>
+      </div>
+      <div style="padding:26px;color:#1C2921;">
+        <div style="display:inline-block;padding:5px 12px;border-radius:999px;background:#edf7ef;color:#164B34;font-size:11px;font-weight:700;letter-spacing:0.05em;">
+          ✓ EMAIL VERIFIED &amp; REGISTRATION RECEIVED
+        </div>
+        <h3 style="margin:14px 0 10px;color:#0C3323;font-size:20px;">
+          Thank You for Submitting Your Form, ${escapeHtml(params.name)}!
+        </h3>
+        <p style="margin:0 0 16px;font-size:14px;line-height:1.65;color:#374151;">
+          We have received your OTP-verified customer registration with <strong>Growth Realtech</strong>. Our Noida property advisory specialist will review your requirements and connect with you shortly with a curated shortlist tailored to your preferences.
+        </p>
+
+        <table style="width:100%;border-collapse:collapse;font-size:13px;margin:18px 0;">
+          ${summaryRows}
+        </table>
+
+        ${
+          params.whatsappUrl
+            ? `<div style="margin:22px 0;text-align:center;">
+                 <a href="${escapeHtml(
+                   params.whatsappUrl
+                 )}" style="display:inline-block;background:#164B34;color:#E0C796;text-decoration:none;font-weight:700;font-size:13px;padding:12px 22px;border-radius:8px;">
+                   Connect With Our Advisory Desk on WhatsApp
+                 </a>
+               </div>`
+            : ""
+        }
+
+        <p style="margin:18px 0 0;font-size:12px;line-height:1.6;color:#555;">
+          Need immediate assistance? Call us directly on <strong>${escapeHtml(
+            advisoryPhone
+          )}</strong> or reply to <a href="mailto:care@growthrealtech.in" style="color:#164B34;font-weight:600;">care@growthrealtech.in</a>.
+        </p>
+      </div>
+      <div style="background:#F6F7F2;border-top:1px solid #e5e7eb;padding:14px 24px;text-align:center;font-size:11px;color:#69776e;">
+        Growth Realtech · Noida, Greater Noida &amp; Yamuna Expressway · ${escapeHtml(advisoryPhone)}
+      </div>
+    </div>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || `"Growth Realtech" <${process.env.SMTP_USER}>`,
+      to: params.to,
+      replyTo: "care@growthrealtech.in",
+      subject: `Thank You for Registering with Growth Realtech (${refCode})`,
+      html,
+    });
+    return { delivered: true };
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error("[Mailer] Customer Thank-You email failed (non-blocking):", errMsg);
+    return { delivered: false, error: errMsg };
+  }
+}

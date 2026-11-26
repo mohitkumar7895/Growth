@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { queryOne, execute, ensureRegistrationSchema } from "@/lib/db";
 import { checkRateLimit, getClientIp, apiError } from "@/lib/security";
-import { sendEnquiryNotificationEmail } from "@/lib/mailer";
+import { sendEnquiryNotificationEmail, sendCustomerThankYouEmail } from "@/lib/mailer";
 import { getWebsiteSettings } from "@/services/siteData";
 import { reverseGeocodeCoordinates } from "@/lib/geocode";
 
@@ -184,36 +184,9 @@ export async function POST(req: NextRequest) {
     // Consume OTP token so it cannot be replayed
     await execute("UPDATE otp_verifications SET verification_token = NULL WHERE id = ?", [otpRow.id]);
 
-    // 3. Forward email to BOTH growthrealtechnoida@gmail.com & care@growthrealtech.in
+    // 3. Build pre-filled WhatsApp message & send emails in parallel (Team + Customer Thank-You)
     const settings = await getWebsiteSettings();
     const extraEmails = [settings.contact_email, settings.contact_email_secondary].filter(Boolean);
-
-    await sendEnquiryNotificationEmail({
-      subject: `Email OTP-Verified Customer Registration: ${d.name} (${cleanPhone})`,
-      heading: "New Customer Profile Registration",
-      extraRecipients: extraEmails,
-      fields: {
-        "Full Name": d.name,
-        "Email Address": `${cleanEmail} ✓ (Email OTP Verified)`,
-        "Mobile Number": cleanPhone,
-        "Registration Date (IST)": regDate,
-        "Registration Time (IST)": `${regTime} IST`,
-        "GPS Co-ordinates": coordinatesLabel
-          ? `${coordinatesLabel}${acc ? ` (±${acc}m)` : ""}`
-          : "Location permission not granted",
-        "GPS Detected Address": geoAddress || "—",
-        "Google Maps Link": mapsUrl || "—",
-        "IP Address": ip,
-        "Interested In": d.requirement,
-        "Property Type": d.type,
-        "Preferred Location": d.location,
-        "Approximate Budget": d.budget,
-        "Address / City": d.address || "—",
-        "Additional Details": d.details || "—",
-      },
-    });
-
-    // 4. Build pre-filled WhatsApp message for +91 82875 69844
     const waNum = (settings.whatsapp_number || "918287569844").replace(/\D/g, "");
     const waText = [
       "Hello Growth Realtech, I have completed my Email OTP-Verified Customer Registration:",
@@ -232,6 +205,48 @@ export async function POST(req: NextRequest) {
     ]
       .filter(Boolean)
       .join("\n");
+    const whatsappUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(waText)}`;
+
+    await Promise.all([
+      sendEnquiryNotificationEmail({
+        subject: `Email OTP-Verified Customer Registration: ${d.name} (${cleanPhone})`,
+        heading: "New Customer Profile Registration",
+        extraRecipients: extraEmails,
+        fields: {
+          "Full Name": d.name,
+          "Email Address": `${cleanEmail} ✓ (Email OTP Verified)`,
+          "Mobile Number": cleanPhone,
+          "Registration Date (IST)": regDate,
+          "Registration Time (IST)": `${regTime} IST`,
+          "GPS Co-ordinates": coordinatesLabel
+            ? `${coordinatesLabel}${acc ? ` (±${acc}m)` : ""}`
+            : "Location permission not granted",
+          "GPS Detected Address": geoAddress || "—",
+          "Google Maps Link": mapsUrl || "—",
+          "IP Address": ip,
+          "Interested In": d.requirement,
+          "Property Type": d.type,
+          "Preferred Location": d.location,
+          "Approximate Budget": d.budget,
+          "Address / City": d.address || "—",
+          "Additional Details": d.details || "—",
+        },
+      }),
+      sendCustomerThankYouEmail({
+        to: cleanEmail,
+        name: d.name,
+        registrationId: regResult.insertId,
+        phone: cleanPhone,
+        requirement: d.requirement,
+        propertyType: d.type,
+        preferredLocation: d.location,
+        budget: d.budget,
+        registrationDate: regDate,
+        registrationTime: `${regTime} IST`,
+        advisoryPhone: settings.contact_phone || "+91 82875 69844",
+        whatsappUrl,
+      }),
+    ]);
 
     return NextResponse.json(
       {
@@ -244,9 +259,9 @@ export async function POST(req: NextRequest) {
           geoAddress,
           mapsUrl,
         },
-        whatsappUrl: `https://wa.me/${waNum}?text=${encodeURIComponent(waText)}`,
+        whatsappUrl,
         message:
-          "Registration completed successfully! Your Email OTP-verified profile (with date, time & location record) has been saved and shared with Growth Realtech.",
+          "Thank you for submitting your form! A confirmation email has been sent to your verified email address and our Noida advisory desk will connect with you shortly.",
       },
       { status: 201 }
     );
