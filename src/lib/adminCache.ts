@@ -38,6 +38,7 @@ function normalizeAdminUrl(input: RequestInfo | URL): string | null {
     const parsed = new URL(urlStr, window.location.origin);
     if (parsed.origin !== window.location.origin) return null;
     if (!parsed.pathname.startsWith("/api/admin/")) return null;
+    if (parsed.pathname.startsWith("/api/admin/export")) return null;
     return `${parsed.pathname}${parsed.search}`;
   } catch {
     return null;

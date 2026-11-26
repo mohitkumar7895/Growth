@@ -39,7 +39,7 @@ export default function SiteFooter({
 
   return (
     <footer className={`border-t border-[#C6A66C]/25 ${footerBg} text-white`}>
-      <div className="mx-auto max-w-7xl px-4 pb-6 pt-9 sm:px-6 sm:pb-8 sm:pt-12 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pb-28 pt-9 sm:px-6 sm:pb-28 sm:pt-12 lg:px-8">
         <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-12 lg:gap-10">
           {/* Brand Column */}
           <div className="col-span-2 lg:col-span-4">

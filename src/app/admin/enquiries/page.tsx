@@ -1,8 +1,28 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Search, Save, Trash2, Phone, MessageCircle, CheckCircle2 } from "lucide-react";
-import { LEAD_STATUSES, type EnquiryItem } from "@/types";
+import {
+  Search,
+  Save,
+  Trash2,
+  Phone,
+  MessageCircle,
+  CheckCircle2,
+  FileSpreadsheet,
+  Database,
+  RotateCcw,
+} from "lucide-react";
+import { LEAD_STATUSES, LOCATIONS, type EnquiryItem } from "@/types";
+
+const ENQUIRY_TYPES = [
+  { value: "All", label: "All Types" },
+  { value: "property", label: "Property" },
+  { value: "project", label: "Project" },
+  { value: "consultation", label: "Consultation" },
+  { value: "investment", label: "Investment" },
+  { value: "site_visit", label: "Site Visit" },
+  { value: "general", label: "General" },
+];
 
 export default function AdminEnquiriesPage() {
   const [enquiries, setEnquiries] = useState<EnquiryItem[]>([]);
@@ -10,17 +30,31 @@ export default function AdminEnquiriesPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
+  const [locationFilter, setLocationFilter] = useState("All");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<EnquiryItem | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
+  const buildFilterParams = (includePagination = false, p = page) => {
+    const params = new URLSearchParams();
+    if (includePagination) {
+      params.set("page", String(p));
+      params.set("pageSize", "15");
+    }
+    if (statusFilter !== "All") params.set("status", statusFilter);
+    if (typeFilter !== "All") params.set("type", typeFilter);
+    if (locationFilter !== "All") params.set("location", locationFilter);
+    if (fromDate) params.set("from", fromDate);
+    if (toDate) params.set("to", toDate);
+    if (q.trim()) params.set("q", q.trim());
+    return params;
+  };
+
   const load = async (p = page) => {
-    const params = new URLSearchParams({
-      page: String(p),
-      pageSize: "15",
-      status: statusFilter,
-    });
-    if (q) params.set("q", q);
+    const params = buildFilterParams(true, p);
     const res = await fetch(`/api/admin/enquiries?${params.toString()}`);
     const data = await res.json();
     setEnquiries(data.enquiries || []);
@@ -32,7 +66,23 @@ export default function AdminEnquiriesPage() {
     load(1);
     setPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter]);
+  }, [statusFilter, typeFilter, locationFilter, fromDate, toDate]);
+
+  const resetFilters = () => {
+    setStatusFilter("All");
+    setTypeFilter("All");
+    setLocationFilter("All");
+    setFromDate("");
+    setToDate("");
+    setQ("");
+    setPage(1);
+  };
+
+  const buildExportUrl = (dataset: "enquiries" | "all") => {
+    const params = buildFilterParams(false);
+    params.set("dataset", dataset);
+    return `/api/admin/export?${params.toString()}`;
+  };
 
   const handleSaveLead = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,42 +116,121 @@ export default function AdminEnquiriesPage() {
 
   return (
     <div className="space-y-5">
-      {/* Filters */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#164B34]/12 bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap gap-1.5">
-          {["All", ...LEAD_STATUSES].map((st) => (
-            <button
-              key={st}
-              type="button"
-              onClick={() => setStatusFilter(st)}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-                statusFilter === st
-                  ? "bg-[#0C3323] text-[#E0C796]"
-                  : "bg-[#F6F7F2] text-gray-700 hover:bg-gray-200"
-              }`}
+      {/* Filters & Excel Export Toolbar */}
+      <search className="block rounded-xl border border-[#164B34]/12 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-1.5">
+            {["All", ...LEAD_STATUSES].map((st) => (
+              <button
+                key={st}
+                type="button"
+                onClick={() => setStatusFilter(st)}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                  statusFilter === st
+                    ? "bg-[#0C3323] text-[#E0C796]"
+                    : "bg-[#F6F7F2] text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {st}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href={buildExportUrl("enquiries")}
+              download
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#164B34] px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0C3323]"
             >
-              {st}
-            </button>
-          ))}
+              <FileSpreadsheet className="h-3.5 w-3.5 text-[#E0C796]" />
+              Export Filtered Excel (.xlsx)
+            </a>
+            <a
+              href={buildExportUrl("all")}
+              download
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C6A66C] bg-[#F6F7F2] px-3 py-2 text-xs font-semibold text-[#0C3323] transition hover:bg-[#E0C796]/30"
+            >
+              <Database className="h-3.5 w-3.5 text-[#164B34]" />
+              Full Database (.xlsx)
+            </a>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <input
-            type="search"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && load(1)}
-            placeholder="Search name, phone, property..."
-            className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs"
-          />
-          <button
-            type="button"
-            onClick={() => load(1)}
-            className="rounded-lg bg-[#164B34] p-2 text-white"
+
+        <div className="mt-3 grid grid-cols-1 gap-2.5 border-t border-gray-100 pt-3 sm:grid-cols-2 lg:grid-cols-6">
+          <select
+            aria-label="Filter by enquiry type"
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-700"
           >
-            <Search className="h-3.5 w-3.5" />
-          </button>
+            {ENQUIRY_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+
+          <select
+            aria-label="Filter by location"
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
+            className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-700"
+          >
+            <option value="All">All Locations</option>
+            {LOCATIONS.map((loc) => (
+              <option key={loc} value={loc}>
+                {loc}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="date"
+            aria-label="From date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            title="From Date"
+            className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-700"
+          />
+
+          <input
+            type="date"
+            aria-label="To date"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            title="To Date"
+            className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-700"
+          />
+
+          <div className="flex items-center gap-1.5 lg:col-span-2">
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && load(1)}
+              placeholder="Search name, phone, email, property..."
+              className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-xs"
+            />
+            <button
+              type="button"
+              onClick={() => load(1)}
+              aria-label="Search enquiries"
+              className="rounded-lg bg-[#164B34] p-2 text-white hover:bg-[#0C3323]"
+            >
+              <Search className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={resetFilters}
+              title="Reset filters"
+              aria-label="Reset filters"
+              className="rounded-lg border border-gray-200 p-2 text-gray-600 hover:bg-gray-100"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
-      </div>
+      </search>
 
       {toast && (
         <div className="flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-3 text-xs text-emerald-800">
@@ -124,47 +253,55 @@ export default function AdminEnquiriesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {enquiries.map((lead) => (
-                  <tr
-                    key={lead.id}
-                    onClick={() => setSelected(lead)}
-                    className={`cursor-pointer transition ${
-                      selected?.id === lead.id ? "bg-[#F6F7F2]" : "hover:bg-gray-50"
-                    }`}
-                  >
-                    <td className="px-4 py-3">
-                      <p className="font-semibold text-[#0C3323]">{lead.name}</p>
-                      <p className="text-gray-500">{lead.phone}</p>
-                      <p className="text-[10px] text-gray-400">
-                        {new Date(lead.created_at).toLocaleDateString("en-IN")}
-                      </p>
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-gray-800">
-                        {lead.property_interest || lead.enquiry_type}
-                      </p>
-                      <p className="text-gray-500">{lead.preferred_location || "—"}</p>
-                    </td>
-                    <td className="px-4 py-3 text-gray-700">{lead.budget_range || "—"}</td>
-                    <td className="px-4 py-3">
-                      <span className="rounded-full bg-[#164B34]/10 px-2.5 py-0.5 text-[10px] font-semibold text-[#164B34]">
-                        {lead.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(lead.id);
-                        }}
-                        className="rounded p-1 text-red-500 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+                {enquiries.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-10 text-center text-gray-400">
+                      No enquiries match your current filter selection.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  enquiries.map((lead) => (
+                    <tr
+                      key={lead.id}
+                      onClick={() => setSelected(lead)}
+                      className={`cursor-pointer transition ${
+                        selected?.id === lead.id ? "bg-[#F6F7F2]" : "hover:bg-gray-50"
+                      }`}
+                    >
+                      <td className="px-4 py-3">
+                        <p className="font-semibold text-[#0C3323]">{lead.name}</p>
+                        <p className="tabular-nums text-gray-500">{lead.phone}</p>
+                        <p className="text-[10px] text-gray-400">
+                          {new Date(lead.created_at).toLocaleString("en-IN")}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="font-medium text-gray-800">
+                          {lead.property_interest || lead.enquiry_type}
+                        </p>
+                        <p className="text-gray-500">{lead.preferred_location || "—"}</p>
+                      </td>
+                      <td className="px-4 py-3 text-gray-700">{lead.budget_range || "—"}</td>
+                      <td className="px-4 py-3">
+                        <span className="rounded-full bg-[#164B34]/10 px-2.5 py-0.5 text-[10px] font-semibold text-[#164B34]">
+                          {lead.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(lead.id);
+                          }}
+                          className="rounded p-1 text-red-500 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -207,7 +344,7 @@ export default function AdminEnquiriesPage() {
                 <h3 className="font-editorial text-2xl font-semibold text-[#0C3323]">
                   {selected.name}
                 </h3>
-                <p className="text-xs text-gray-500">
+                <p className="tabular-nums text-xs text-gray-500">
                   {selected.phone} {selected.email ? `• ${selected.email}` : ""}
                 </p>
                 <div className="mt-3 flex gap-2">

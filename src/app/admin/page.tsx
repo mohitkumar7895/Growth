@@ -11,6 +11,8 @@ import {
   ArrowUpRight,
   Activity,
   Bell,
+  FileSpreadsheet,
+  Database,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -79,6 +81,15 @@ const CHART_COLORS = ["#164B34", "#C6A66C", "#246C49", "#0C3323", "#E0C796", "#4
 export default function AdminDashboardPage() {
   const [data, setData] = useState<DashboardPayload | null>(null);
   const [loading, setLoading] = useState(true);
+  const [exportFrom, setExportFrom] = useState("");
+  const [exportTo, setExportTo] = useState("");
+
+  const buildExportHref = (dataset: "all" | "enquiries" | "contacts" | "customers") => {
+    const params = new URLSearchParams({ dataset });
+    if (exportFrom) params.set("from", exportFrom);
+    if (exportTo) params.set("to", exportTo);
+    return `/api/admin/export?${params.toString()}`;
+  };
 
   useEffect(() => {
     fetch("/api/admin/dashboard")
@@ -141,6 +152,64 @@ export default function AdminDashboardPage() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Excel Database Export Center */}
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[#C6A66C]/40 bg-white p-4 shadow-sm sm:p-5">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#246C49]">
+            Excel Reporting &amp; Database Backup
+          </p>
+          <h3 className="mt-0.5 font-editorial text-xl font-semibold text-[#0C3323]">
+            Download Enquiries, Contacts &amp; Customer Database (.xlsx)
+          </h3>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="date"
+            aria-label="Export from date"
+            value={exportFrom}
+            onChange={(e) => setExportFrom(e.target.value)}
+            title="From Date"
+            className="rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs text-gray-700"
+          />
+          <input
+            type="date"
+            aria-label="Export to date"
+            value={exportTo}
+            onChange={(e) => setExportTo(e.target.value)}
+            title="To Date"
+            className="rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs text-gray-700"
+          />
+          <a
+            href={buildExportHref("all")}
+            download
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[#0C3323] px-3.5 py-2 text-xs font-semibold text-[#E0C796] shadow-sm transition hover:bg-[#164B34]"
+          >
+            <Database className="h-3.5 w-3.5" /> Full Database (.xlsx)
+          </a>
+          <a
+            href={buildExportHref("enquiries")}
+            download
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#164B34]/25 bg-[#F6F7F2] px-3 py-2 text-xs font-semibold text-[#0C3323] transition hover:bg-[#E0C796]/30"
+          >
+            <FileSpreadsheet className="h-3.5 w-3.5 text-[#164B34]" /> Enquiries
+          </a>
+          <a
+            href={buildExportHref("contacts")}
+            download
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#164B34]/25 bg-[#F6F7F2] px-3 py-2 text-xs font-semibold text-[#0C3323] transition hover:bg-[#E0C796]/30"
+          >
+            <FileSpreadsheet className="h-3.5 w-3.5 text-[#164B34]" /> Contacts
+          </a>
+          <a
+            href={buildExportHref("customers")}
+            download
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#164B34]/25 bg-[#F6F7F2] px-3 py-2 text-xs font-semibold text-[#0C3323] transition hover:bg-[#E0C796]/30"
+          >
+            <FileSpreadsheet className="h-3.5 w-3.5 text-[#164B34]" /> Customers
+          </a>
+        </div>
       </div>
 
       {/* Real Database Interactive Charts */}

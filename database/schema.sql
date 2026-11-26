@@ -486,10 +486,12 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   KEY `idx_notifications_read` (`is_read`, `created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 26. OTP Verifications (Server-side hashed OTP with expiry & attempt limits)
+-- 26. OTP Verifications (Server-side hashed Email & Mobile OTP with expiry & attempt limits)
 CREATE TABLE IF NOT EXISTS `otp_verifications` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `phone` VARCHAR(30) NOT NULL,
+  `channel` ENUM('email','phone') NOT NULL DEFAULT 'email',
+  `email` VARCHAR(180) DEFAULT NULL,
+  `phone` VARCHAR(30) DEFAULT NULL,
   `otp_hash` VARCHAR(128) NOT NULL,
   `verification_token` VARCHAR(128) DEFAULT NULL,
   `attempts` TINYINT UNSIGNED NOT NULL DEFAULT 0,
@@ -497,25 +499,36 @@ CREATE TABLE IF NOT EXISTS `otp_verifications` (
   `expires_at` DATETIME NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_otp_email_created` (`email`, `created_at`),
   KEY `idx_otp_phone_created` (`phone`, `created_at`),
   KEY `idx_otp_token` (`verification_token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 27. Customer Registrations (OTP-verified profiles)
+-- 27. Customer Registrations (OTP-verified profiles with Date, Time & GPS Co-ordinates)
 CREATE TABLE IF NOT EXISTS `customer_registrations` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `full_name` VARCHAR(150) NOT NULL,
   `email` VARCHAR(180) DEFAULT NULL,
+  `email_verified` TINYINT(1) NOT NULL DEFAULT 0,
   `country_code` VARCHAR(10) NOT NULL DEFAULT '+91',
   `mobile` VARCHAR(20) NOT NULL,
   `full_phone` VARCHAR(30) NOT NULL,
-  `mobile_verified` TINYINT(1) NOT NULL DEFAULT 1,
+  `mobile_verified` TINYINT(1) NOT NULL DEFAULT 0,
+  `verification_method` ENUM('email','phone') NOT NULL DEFAULT 'email',
   `requirement` VARCHAR(120) NOT NULL,
   `property_type` VARCHAR(120) NOT NULL,
   `preferred_location` VARCHAR(120) NOT NULL,
   `budget_range` VARCHAR(100) NOT NULL,
   `address_city` VARCHAR(255) DEFAULT NULL,
   `additional_details` TEXT DEFAULT NULL,
+  `registration_date` DATE DEFAULT NULL,
+  `registration_time` TIME DEFAULT NULL,
+  `latitude` DECIMAL(10, 7) DEFAULT NULL,
+  `longitude` DECIMAL(10, 7) DEFAULT NULL,
+  `location_accuracy` DOUBLE DEFAULT NULL,
+  `coordinates_label` VARCHAR(120) DEFAULT NULL,
+  `geo_address` VARCHAR(500) DEFAULT NULL,
+  `ip_address` VARCHAR(60) DEFAULT NULL,
   `consent_given` TINYINT(1) NOT NULL DEFAULT 1,
   `status` ENUM('New','Verified','Contacted','Site Visit Scheduled','Converted','Closed') NOT NULL DEFAULT 'Verified',
   `internal_notes` TEXT DEFAULT NULL,
@@ -525,6 +538,8 @@ CREATE TABLE IF NOT EXISTS `customer_registrations` (
   PRIMARY KEY (`id`),
   KEY `idx_cust_status_created` (`status`, `created_at`),
   KEY `idx_cust_phone` (`full_phone`),
+  KEY `idx_cust_email` (`email`),
+  KEY `idx_cust_reg_date` (`registration_date`),
   CONSTRAINT `fk_cust_assigned` FOREIGN KEY (`assigned_to`) REFERENCES `admins` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

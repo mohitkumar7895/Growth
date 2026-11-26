@@ -9,6 +9,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
     const type = searchParams.get("type");
+    const location = searchParams.get("location");
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
     const q = searchParams.get("q");
     const page = Math.max(1, Number(searchParams.get("page") || 1));
     const pageSize = Math.min(50, Math.max(5, Number(searchParams.get("pageSize") || 15)));
@@ -23,6 +26,18 @@ export async function GET(req: NextRequest) {
     if (type && type !== "All") {
       conditions.push("e.enquiry_type = ?");
       params.push(type);
+    }
+    if (location && location !== "All") {
+      conditions.push("e.preferred_location LIKE ?");
+      params.push(`%${location}%`);
+    }
+    if (from && /^\d{4}-\d{2}-\d{2}$/.test(from)) {
+      conditions.push("DATE(e.created_at) >= ?");
+      params.push(from);
+    }
+    if (to && /^\d{4}-\d{2}-\d{2}$/.test(to)) {
+      conditions.push("DATE(e.created_at) <= ?");
+      params.push(to);
     }
     if (q) {
       conditions.push(

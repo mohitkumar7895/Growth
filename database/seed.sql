@@ -432,10 +432,27 @@ INSERT INTO `projects` (
   'Gaur Alaris Yamuna Expressway | Growth Realtech Residential Advisory',
   'Get personalised consulting and verified information on Gaur Alaris along the Yamuna Expressway with Growth Realtech.'
 )
-ON DUPLICATE KEY UPDATE `name` = VALUES(`name`), `featured_image` = VALUES(`featured_image`);
+ON DUPLICATE KEY UPDATE
+  `name` = VALUES(`name`),
+  `slug` = VALUES(`slug`),
+  `category` = VALUES(`category`),
+  `property_category_id` = VALUES(`property_category_id`),
+  `developer_name` = VALUES(`developer_name`),
+  `location` = VALUES(`location`),
+  `sector` = VALUES(`sector`),
+  `region_filter` = VALUES(`region_filter`),
+  `short_description` = VALUES(`short_description`),
+  `description` = VALUES(`description`),
+  `featured_image` = VALUES(`featured_image`),
+  `configuration` = VALUES(`configuration`),
+  `amenities_json` = VALUES(`amenities_json`),
+  `specifications_json` = VALUES(`specifications_json`),
+  `map_embed_url` = VALUES(`map_embed_url`),
+  `meta_title` = VALUES(`meta_title`),
+  `meta_description` = VALUES(`meta_description`);
 
 -- Project Gallery Images (Actual Project Elevations & Views)
-INSERT IGNORE INTO `project_images` (`id`, `project_id`, `image_url`, `alt_text`, `caption`, `sort_order`) VALUES
+INSERT INTO `project_images` (`id`, `project_id`, `image_url`, `alt_text`, `caption`, `sort_order`) VALUES
 (1, 1, '/images/projects/orion-one32.jpg', 'Orion One32 Sector 132 Noida Elevation', 'Orion One32 — Sector 132, Noida Expressway Exterior Elevation', 1),
 (2, 1, '/images/projects/orion-one32-2.jpg', 'Orion One32 Aerial View', 'Orion One32 — IT/ITES Office, Studio & Retail Master View', 2),
 (3, 1, '/images/projects/orion-one32-3.jpg', 'Orion One32 High Street Retail Entrance', 'Orion One32 — European High-Street Retail Entrance', 3),
@@ -453,7 +470,13 @@ INSERT IGNORE INTO `project_images` (`id`, `project_id`, `image_url`, `alt_text`
 (15, 5, '/images/projects/dxn-orion-2.jpg', 'DXN Orion Landscaped Court View', 'DXN Orion — Landscaped Recreation & Tower View', 3),
 (16, 6, '/images/projects/gaur-alaris.webp', 'Gaur Alaris Yamuna Expressway Elevation', 'Gaur Alaris — Sector 22D, Yamuna Expressway Illuminated Towers', 1),
 (17, 6, '/images/projects/gaur-alaris-2.webp', 'Gaur Alaris Yamuna Expressway Corridor View', 'Gaur Alaris — Landmark Living on Yamuna Expressway', 2),
-(18, 6, '/images/projects/gaur-alaris-3.webp', 'Gaur Alaris Interior Residence', 'Gaur Alaris — Contemporary Luxury Residence Interior', 3);
+(18, 6, '/images/projects/gaur-alaris-3.webp', 'Gaur Alaris Interior Residence', 'Gaur Alaris — Contemporary Luxury Residence Interior', 3)
+ON DUPLICATE KEY UPDATE
+  `project_id` = VALUES(`project_id`),
+  `image_url` = VALUES(`image_url`),
+  `alt_text` = VALUES(`alt_text`),
+  `caption` = VALUES(`caption`),
+  `sort_order` = VALUES(`sort_order`);
 
 -- 9. Properties (Powering Smart Property Search with real DB records)
 INSERT INTO `properties` (

@@ -52,7 +52,7 @@ export default function ContactSection({
                   </p>
                   <a
                     href={`tel:${phone.replace(/\s+/g, "")}`}
-                    className="block font-editorial text-xl font-semibold text-[#0C3323] hover:text-[#164B34] sm:text-2xl"
+                    className="mt-0.5 block font-sans text-lg font-bold tracking-wide tabular-nums text-[#0C3323] hover:text-[#164B34] sm:text-xl"
                   >
                     {phone}
                   </a>

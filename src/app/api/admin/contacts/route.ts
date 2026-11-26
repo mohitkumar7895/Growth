@@ -8,6 +8,8 @@ export async function GET(req: NextRequest) {
     await requireAdmin("contacts.manage");
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
     const q = searchParams.get("q");
 
     const conditions: string[] = [];
@@ -16,10 +18,18 @@ export async function GET(req: NextRequest) {
       conditions.push("status = ?");
       params.push(status);
     }
+    if (from && /^\d{4}-\d{2}-\d{2}$/.test(from)) {
+      conditions.push("DATE(created_at) >= ?");
+      params.push(from);
+    }
+    if (to && /^\d{4}-\d{2}-\d{2}$/.test(to)) {
+      conditions.push("DATE(created_at) <= ?");
+      params.push(to);
+    }
     if (q) {
-      conditions.push("(name LIKE ? OR phone LIKE ? OR email LIKE ? OR subject LIKE ?)");
+      conditions.push("(name LIKE ? OR phone LIKE ? OR email LIKE ? OR subject LIKE ? OR location LIKE ?)");
       const t = `%${q}%`;
-      params.push(t, t, t, t);
+      params.push(t, t, t, t, t);
     }
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
     const contacts = await query(
