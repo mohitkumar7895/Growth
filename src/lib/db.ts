@@ -53,77 +53,141 @@ export async function execute(
 
 let registrationSchemaPromise: Promise<void> | null = null;
 
+async function safeAlter(sql: string): Promise<void> {
+  try {
+    await db.query(sql);
+  } catch (err) {
+    const code = (err as { code?: string })?.code;
+    // Ignore benign duplicate column/key errors when racing concurrent startups
+    if (code === "ER_DUP_FIELDNAME" || code === "ER_DUP_KEYNAME") return;
+    console.error("[DB] Migration statement failed:", sql, err);
+  }
+}
+
+async function getTableColumns(tableName: string): Promise<Set<string>> {
+  const [rows] = await db.query(
+    `SELECT COLUMN_NAME AS col
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?`,
+    [tableName]
+  );
+  return new Set(
+    (rows as Array<{ col: string }>).map((r) => String(r.col).toLowerCase())
+  );
+}
+
 /**
- * Ensures otp_verifications and customer_registrations have Email OTP +
- * Date/Time/GPS Coordinates columns even on databases created before this upgrade.
+ * Ensures otp_verifications and customer_registrations exist and have all
+ * Email OTP + Date/Time/GPS Coordinates/Address columns on any live database.
+ * Uses db.query() (non-prepared protocol) + INFORMATION_SCHEMA so it works
+ * across MySQL 5.7, 8.0, 8.4, and MariaDB without ER_UNSUPPORTED_PS errors.
  */
 export async function ensureRegistrationSchema(): Promise<void> {
   if (registrationSchemaPromise) return registrationSchemaPromise;
 
   registrationSchemaPromise = (async () => {
     try {
-      const otpCols = await query<{ Field: string }>(
-        "SHOW COLUMNS FROM `otp_verifications`"
-      );
-      const otpColSet = new Set(otpCols.map((c) => c.Field));
-      if (!otpColSet.has("channel")) {
-        await db.query(
-          "ALTER TABLE `otp_verifications` ADD COLUMN `channel` ENUM('email','phone') NOT NULL DEFAULT 'email' AFTER `id`"
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS \`otp_verifications\` (
+          \`id\` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+          \`channel\` ENUM('email','phone') NOT NULL DEFAULT 'email',
+          \`email\` VARCHAR(180) DEFAULT NULL,
+          \`phone\` VARCHAR(30) DEFAULT NULL,
+          \`otp_hash\` VARCHAR(128) NOT NULL,
+          \`verification_token\` VARCHAR(128) DEFAULT NULL,
+          \`attempts\` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+          \`is_verified\` TINYINT(1) NOT NULL DEFAULT 0,
+          \`expires_at\` DATETIME NOT NULL,
+          \`created_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (\`id\`),
+          KEY \`idx_otp_email_created\` (\`email\`, \`created_at\`),
+          KEY \`idx_otp_phone_created\` (\`phone\`, \`created_at\`),
+          KEY \`idx_otp_token\` (\`verification_token\`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+      `);
+
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS \`customer_registrations\` (
+          \`id\` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+          \`full_name\` VARCHAR(150) NOT NULL,
+          \`email\` VARCHAR(180) DEFAULT NULL,
+          \`email_verified\` TINYINT(1) NOT NULL DEFAULT 0,
+          \`country_code\` VARCHAR(10) NOT NULL DEFAULT '+91',
+          \`mobile\` VARCHAR(20) NOT NULL,
+          \`full_phone\` VARCHAR(30) NOT NULL,
+          \`mobile_verified\` TINYINT(1) NOT NULL DEFAULT 0,
+          \`verification_method\` ENUM('email','phone') NOT NULL DEFAULT 'email',
+          \`requirement\` VARCHAR(120) NOT NULL,
+          \`property_type\` VARCHAR(120) NOT NULL,
+          \`preferred_location\` VARCHAR(120) NOT NULL,
+          \`budget_range\` VARCHAR(100) NOT NULL,
+          \`address_city\` VARCHAR(255) DEFAULT NULL,
+          \`additional_details\` TEXT DEFAULT NULL,
+          \`registration_date\` DATE DEFAULT NULL,
+          \`registration_time\` TIME DEFAULT NULL,
+          \`latitude\` DECIMAL(10, 7) DEFAULT NULL,
+          \`longitude\` DECIMAL(10, 7) DEFAULT NULL,
+          \`location_accuracy\` DOUBLE DEFAULT NULL,
+          \`coordinates_label\` VARCHAR(120) DEFAULT NULL,
+          \`geo_address\` VARCHAR(500) DEFAULT NULL,
+          \`ip_address\` VARCHAR(60) DEFAULT NULL,
+          \`consent_given\` TINYINT(1) NOT NULL DEFAULT 1,
+          \`status\` ENUM('New','Verified','Contacted','Site Visit Scheduled','Converted','Closed') NOT NULL DEFAULT 'Verified',
+          \`internal_notes\` TEXT DEFAULT NULL,
+          \`assigned_to\` INT UNSIGNED DEFAULT NULL,
+          \`created_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          \`updated_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (\`id\`),
+          KEY \`idx_cust_status_created\` (\`status\`, \`created_at\`),
+          KEY \`idx_cust_phone\` (\`full_phone\`),
+          KEY \`idx_cust_email\` (\`email\`),
+          KEY \`idx_cust_reg_date\` (\`registration_date\`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+      `);
+
+      const otpCols = await getTableColumns("otp_verifications");
+      if (!otpCols.has("channel")) {
+        await safeAlter(
+          "ALTER TABLE `otp_verifications` ADD COLUMN `channel` ENUM('email','phone') NOT NULL DEFAULT 'email'"
         );
       }
-      if (!otpColSet.has("email")) {
-        await db.query(
-          "ALTER TABLE `otp_verifications` ADD COLUMN `email` VARCHAR(180) DEFAULT NULL AFTER `channel`, ADD KEY `idx_otp_email_created` (`email`, `created_at`)"
+      if (!otpCols.has("email")) {
+        await safeAlter(
+          "ALTER TABLE `otp_verifications` ADD COLUMN `email` VARCHAR(180) DEFAULT NULL"
+        );
+        await safeAlter(
+          "ALTER TABLE `otp_verifications` ADD KEY `idx_otp_email_created` (`email`, `created_at`)"
         );
       }
-      await db.query(
+      await safeAlter(
         "ALTER TABLE `otp_verifications` MODIFY COLUMN `phone` VARCHAR(30) DEFAULT NULL"
       );
 
-      const custCols = await query<{ Field: string }>(
-        "SHOW COLUMNS FROM `customer_registrations`"
-      );
-      const custColSet = new Set(custCols.map((c) => c.Field));
-      const alters: string[] = [];
-      if (!custColSet.has("email_verified")) {
-        alters.push("ADD COLUMN `email_verified` TINYINT(1) NOT NULL DEFAULT 0 AFTER `email`");
-      }
-      if (!custColSet.has("verification_method")) {
-        alters.push(
-          "ADD COLUMN `verification_method` ENUM('email','phone') NOT NULL DEFAULT 'email' AFTER `mobile_verified`"
-        );
-      }
-      if (!custColSet.has("registration_date")) {
-        alters.push("ADD COLUMN `registration_date` DATE DEFAULT NULL AFTER `additional_details`");
-      }
-      if (!custColSet.has("registration_time")) {
-        alters.push("ADD COLUMN `registration_time` TIME DEFAULT NULL AFTER `registration_date`");
-      }
-      if (!custColSet.has("latitude")) {
-        alters.push("ADD COLUMN `latitude` DECIMAL(10, 7) DEFAULT NULL AFTER `registration_time`");
-      }
-      if (!custColSet.has("longitude")) {
-        alters.push("ADD COLUMN `longitude` DECIMAL(10, 7) DEFAULT NULL AFTER `latitude`");
-      }
-      if (!custColSet.has("location_accuracy")) {
-        alters.push("ADD COLUMN `location_accuracy` DOUBLE DEFAULT NULL AFTER `longitude`");
-      }
-      if (!custColSet.has("coordinates_label")) {
-        alters.push("ADD COLUMN `coordinates_label` VARCHAR(120) DEFAULT NULL AFTER `location_accuracy`");
-      }
-      if (!custColSet.has("geo_address")) {
-        alters.push("ADD COLUMN `geo_address` VARCHAR(500) DEFAULT NULL AFTER `coordinates_label`");
-      }
-      if (!custColSet.has("ip_address")) {
-        alters.push("ADD COLUMN `ip_address` VARCHAR(60) DEFAULT NULL AFTER `geo_address`");
-      }
-      if (alters.length > 0) {
-        await db.query(`ALTER TABLE \`customer_registrations\` ${alters.join(", ")}`);
+      const custCols = await getTableColumns("customer_registrations");
+      const custColumnDefs: Array<[string, string]> = [
+        ["email_verified", "TINYINT(1) NOT NULL DEFAULT 0"],
+        ["verification_method", "ENUM('email','phone') NOT NULL DEFAULT 'email'"],
+        ["registration_date", "DATE DEFAULT NULL"],
+        ["registration_time", "TIME DEFAULT NULL"],
+        ["latitude", "DECIMAL(10, 7) DEFAULT NULL"],
+        ["longitude", "DECIMAL(10, 7) DEFAULT NULL"],
+        ["location_accuracy", "DOUBLE DEFAULT NULL"],
+        ["coordinates_label", "VARCHAR(120) DEFAULT NULL"],
+        ["geo_address", "VARCHAR(500) DEFAULT NULL"],
+        ["ip_address", "VARCHAR(60) DEFAULT NULL"],
+      ];
+
+      for (const [colName, colDef] of custColumnDefs) {
+        if (!custCols.has(colName)) {
+          await safeAlter(
+            `ALTER TABLE \`customer_registrations\` ADD COLUMN \`${colName}\` ${colDef}`
+          );
+        }
       }
     } catch (err) {
-      // Allow retry on subsequent requests if DB wasn't ready yet
       registrationSchemaPromise = null;
-      console.error("[DB] ensureRegistrationSchema check skipped:", err);
+      console.error("[DB] ensureRegistrationSchema failed:", err);
+      throw err;
     }
   })();
 

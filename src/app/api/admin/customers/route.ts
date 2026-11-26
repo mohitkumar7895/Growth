@@ -4,6 +4,9 @@ import { requireAdmin, logActivity } from "@/lib/auth";
 import { apiError, getClientIp } from "@/lib/security";
 import { reverseGeocodeCoordinates } from "@/lib/geocode";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     await requireAdmin("enquiries.manage");

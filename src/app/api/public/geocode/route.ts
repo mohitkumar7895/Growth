@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, getClientIp } from "@/lib/security";
 import { reverseGeocodeDetailed } from "@/lib/geocode";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   const ip = getClientIp(req);
   const limit = checkRateLimit(`geocode:${ip}`, 30, 60_000);

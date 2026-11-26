@@ -71,6 +71,7 @@ interface GeoCoordsState {
   accuracy: number | null;
   address: string | null;
   details: GeoAddressDetails | null;
+  errorMessage: string | null;
   resolvingAddress: boolean;
   status: "idle" | "locating" | "captured" | "denied" | "unsupported";
 }
@@ -133,6 +134,7 @@ export default function CustomerRegistrationForm({
     accuracy: null,
     address: null,
     details: null,
+    errorMessage: null,
     resolvingAddress: false,
     status: "idle",
   });
@@ -257,17 +259,36 @@ export default function CustomerRegistrationForm({
       }
     };
 
-    const handleError = () => {
+    const handleError = (err?: GeolocationPositionError) => {
       stopGeoWatch();
+      let msg = "Location permission not granted. Allow Location in browser settings.";
+      if (typeof window !== "undefined" && !window.isSecureContext) {
+        msg = "GPS requires HTTPS on live domains.";
+      } else if (err?.code === 2) {
+        msg = "GPS signal unavailable on this device.";
+      } else if (err?.code === 3) {
+        msg = "Location lookup timed out — click Refresh Accurate GPS to retry.";
+      }
       setGeo((prev) =>
-        prev.status === "captured" ? prev : { ...prev, status: "denied" }
+        prev.status === "captured"
+          ? prev
+          : { ...prev, status: "denied", errorMessage: msg }
       );
     };
 
-    // High-accuracy GPS watch for up to 7 seconds (maximumAge: 0 avoids stale cached location)
+    setGeo((prev) => ({ ...prev, errorMessage: null }));
+
+    // 1. Immediate high-accuracy fix (triggers browser permission prompt reliably)
+    navigator.geolocation.getCurrentPosition(handlePosition, handleError, {
+      enableHighAccuracy: true,
+      timeout: 12000,
+      maximumAge: 0,
+    });
+
+    // 2. Refine GPS lock for up to 7 seconds to capture the most accurate reading
     geoWatchIdRef.current = navigator.geolocation.watchPosition(
       handlePosition,
-      handleError,
+      () => {},
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
 
@@ -595,7 +616,9 @@ export default function CustomerRegistrationForm({
                 ) : geo.status === "locating" ? (
                   <span className="text-[#536258]">Detecting high-accuracy GPS…</span>
                 ) : (
-                  <span className="text-[#69776e]">GPS co-ordinates not captured yet</span>
+                  <span className="text-[#69776e]">
+                    {geo.errorMessage || "GPS co-ordinates not captured yet"}
+                  </span>
                 )}
               </span>
             </div>

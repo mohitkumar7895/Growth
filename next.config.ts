@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
+  serverExternalPackages: ["exceljs", "nodemailer", "mysql2"],
   images: {
     unoptimized: false,
     formats: ["image/avif", "image/webp"],

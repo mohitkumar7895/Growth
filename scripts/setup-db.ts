@@ -65,12 +65,12 @@ async function main() {
     const otpCols = new Set((otpColsRaw as Array<{ Field: string }>).map((c) => c.Field));
     if (!otpCols.has("channel")) {
       await connection.query(
-        "ALTER TABLE `otp_verifications` ADD COLUMN `channel` ENUM('email','phone') NOT NULL DEFAULT 'email' AFTER `id`"
+        "ALTER TABLE `otp_verifications` ADD COLUMN `channel` ENUM('email','phone') NOT NULL DEFAULT 'email'"
       );
     }
     if (!otpCols.has("email")) {
       await connection.query(
-        "ALTER TABLE `otp_verifications` ADD COLUMN `email` VARCHAR(180) DEFAULT NULL AFTER `channel`, ADD KEY `idx_otp_email_created` (`email`, `created_at`)"
+        "ALTER TABLE `otp_verifications` ADD COLUMN `email` VARCHAR(180) DEFAULT NULL, ADD KEY `idx_otp_email_created` (`email`, `created_at`)"
       );
     }
     await connection.query(
@@ -79,42 +79,25 @@ async function main() {
 
     const [custColsRaw] = await connection.query("SHOW COLUMNS FROM `customer_registrations`");
     const custCols = new Set((custColsRaw as Array<{ Field: string }>).map((c) => c.Field));
-    const custAlters: string[] = [];
-    if (!custCols.has("email_verified")) {
-      custAlters.push("ADD COLUMN `email_verified` TINYINT(1) NOT NULL DEFAULT 0 AFTER `email`");
-    }
-    if (!custCols.has("verification_method")) {
-      custAlters.push(
-        "ADD COLUMN `verification_method` ENUM('email','phone') NOT NULL DEFAULT 'email' AFTER `mobile_verified`"
-      );
-    }
-    if (!custCols.has("registration_date")) {
-      custAlters.push("ADD COLUMN `registration_date` DATE DEFAULT NULL AFTER `additional_details`");
-    }
-    if (!custCols.has("registration_time")) {
-      custAlters.push("ADD COLUMN `registration_time` TIME DEFAULT NULL AFTER `registration_date`");
-    }
-    if (!custCols.has("latitude")) {
-      custAlters.push("ADD COLUMN `latitude` DECIMAL(10, 7) DEFAULT NULL AFTER `registration_time`");
-    }
-    if (!custCols.has("longitude")) {
-      custAlters.push("ADD COLUMN `longitude` DECIMAL(10, 7) DEFAULT NULL AFTER `latitude`");
-    }
-    if (!custCols.has("location_accuracy")) {
-      custAlters.push("ADD COLUMN `location_accuracy` DOUBLE DEFAULT NULL AFTER `longitude`");
-    }
-    if (!custCols.has("coordinates_label")) {
-      custAlters.push("ADD COLUMN `coordinates_label` VARCHAR(120) DEFAULT NULL AFTER `location_accuracy`");
-    }
-    if (!custCols.has("geo_address")) {
-      custAlters.push("ADD COLUMN `geo_address` VARCHAR(500) DEFAULT NULL AFTER `coordinates_label`");
-    }
-    if (!custCols.has("ip_address")) {
-      custAlters.push("ADD COLUMN `ip_address` VARCHAR(60) DEFAULT NULL AFTER `geo_address`");
-    }
-    if (custAlters.length > 0) {
-      console.log("[DB Setup] Upgrading customer_registrations columns...");
-      await connection.query(`ALTER TABLE \`customer_registrations\` ${custAlters.join(", ")}`);
+    const custColumnDefs: Array<[string, string]> = [
+      ["email_verified", "TINYINT(1) NOT NULL DEFAULT 0"],
+      ["verification_method", "ENUM('email','phone') NOT NULL DEFAULT 'email'"],
+      ["registration_date", "DATE DEFAULT NULL"],
+      ["registration_time", "TIME DEFAULT NULL"],
+      ["latitude", "DECIMAL(10, 7) DEFAULT NULL"],
+      ["longitude", "DECIMAL(10, 7) DEFAULT NULL"],
+      ["location_accuracy", "DOUBLE DEFAULT NULL"],
+      ["coordinates_label", "VARCHAR(120) DEFAULT NULL"],
+      ["geo_address", "VARCHAR(500) DEFAULT NULL"],
+      ["ip_address", "VARCHAR(60) DEFAULT NULL"],
+    ];
+    for (const [colName, colDef] of custColumnDefs) {
+      if (!custCols.has(colName)) {
+        console.log(`[DB Setup] Adding customer_registrations.${colName}...`);
+        await connection.query(
+          `ALTER TABLE \`customer_registrations\` ADD COLUMN \`${colName}\` ${colDef}`
+        );
+      }
     }
 
     const seedSql = fs.readFileSync(

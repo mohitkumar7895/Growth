@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { queryOne, execute, ensureRegistrationSchema } from "@/lib/db";
 import { checkRateLimit, getClientIp, apiError } from "@/lib/security";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 function hashEmailOtp(email: string, otp: string): string {
   const secret = process.env.JWT_SECRET || "growth-realtech-otp-secret";
   return crypto

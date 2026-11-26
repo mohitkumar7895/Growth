@@ -4,6 +4,9 @@ import { execute, ensureRegistrationSchema } from "@/lib/db";
 import { checkRateLimit, getClientIp, apiError } from "@/lib/security";
 import { sendOtpEmail } from "@/lib/mailer";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 function hashEmailOtp(email: string, otp: string): string {
   const secret = process.env.JWT_SECRET || "growth-realtech-otp-secret";
   return crypto

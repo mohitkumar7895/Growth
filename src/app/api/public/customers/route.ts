@@ -6,6 +6,9 @@ import { sendEnquiryNotificationEmail } from "@/lib/mailer";
 import { getWebsiteSettings } from "@/services/siteData";
 import { reverseGeocodeCoordinates } from "@/lib/geocode";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 const customerRegistrationSchema = z.object({
   name: z.string().trim().min(2, "Please enter your full name").max(150),
   email: z.string().trim().email("Please enter a valid email address"),

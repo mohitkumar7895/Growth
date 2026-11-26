@@ -4,6 +4,9 @@ import { query, ensureRegistrationSchema } from "@/lib/db";
 import { requireAdmin, logActivity } from "@/lib/auth";
 import { apiError, getClientIp } from "@/lib/security";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 function formatIstParts(val: unknown): { date: string; time: string } {
   if (!val) return { date: "", time: "" };
   const d = val instanceof Date ? val : new Date(String(val));
