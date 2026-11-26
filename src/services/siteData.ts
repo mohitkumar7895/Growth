@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { query, queryOne } from "@/lib/db";
+import { query, queryOne, ensureLiveContentSynced } from "@/lib/db";
 import { SITE_CACHE_TAG } from "@/lib/cache";
 import type {
   WebsiteSettingsMap,
@@ -72,6 +72,7 @@ const CACHE_OPTS = { tags: [SITE_CACHE_TAG], revalidate: 300 };
 const fetchSettingsCached = unstable_cache(
   async (): Promise<WebsiteSettingsMap> => {
     try {
+      await ensureLiveContentSynced();
       const rows = await query<{ setting_key: string; setting_value: string | null }>(
         "SELECT setting_key, setting_value FROM website_settings"
       );
@@ -96,6 +97,7 @@ export async function getWebsiteSettings(): Promise<WebsiteSettingsMap> {
 
 const fetchNavigationCached = unstable_cache(
   async (location: string, activeOnly: boolean): Promise<NavigationItem[]> => {
+    await ensureLiveContentSynced();
     const conditions: string[] = [];
     const params: unknown[] = [];
     if (location !== "ALL") {
@@ -124,6 +126,7 @@ export async function getNavigationMenus(
 
 const fetchHomepageSectionsCached = unstable_cache(
   async (includeHidden: boolean): Promise<HomepageSection[]> => {
+    await ensureLiveContentSynced();
     const where = includeHidden
       ? ""
       : "WHERE is_visible = 1 AND status = 'published'";
@@ -263,6 +266,7 @@ export async function getPropertyBySlug(slug: string): Promise<PropertyItem | nu
 
 const fetchProjectsCached = unstable_cache(
   async (serializedKey: string): Promise<ProjectItem[]> => {
+    await ensureLiveContentSynced();
     const filters = JSON.parse(serializedKey) as {
       region?: string;
       category?: string;
@@ -312,6 +316,7 @@ export async function getProjects(filters?: {
 
 const fetchProjectBySlugCached = unstable_cache(
   async (slug: string): Promise<ProjectItem | null> => {
+    await ensureLiveContentSynced();
     const project = await queryOne<ProjectItem>(
       `SELECT * FROM projects WHERE slug = ? AND status = 'published' LIMIT 1`,
       [slug]
