@@ -54,7 +54,34 @@ export default function SiteHeader({
     setMobileOpen(false);
   }, [pathname]);
 
-  const regularLinks = menuItems.filter((item) => !item.is_cta);
+  const baseRegularLinks = menuItems.filter((item) => !item.is_cta);
+  const hasRegisterLink = baseRegularLinks.some(
+    (item) => item.url === "/register"
+  );
+  const regularLinks: NavigationItem[] = hasRegisterLink
+    ? baseRegularLinks
+    : (() => {
+        const registerItem: NavigationItem = {
+          id: -101,
+          label: "Register",
+          url: "/register",
+          location: "header",
+          parent_id: null,
+          target: "_self",
+          sort_order: 8,
+          is_active: 1,
+          is_cta: 0,
+        };
+        const contactIdx = baseRegularLinks.findIndex(
+          (i) => i.url === "/contact"
+        );
+        if (contactIdx === -1) return [...baseRegularLinks, registerItem];
+        return [
+          ...baseRegularLinks.slice(0, contactIdx),
+          registerItem,
+          ...baseRegularLinks.slice(contactIdx),
+        ];
+      })();
   const ctaLinks = menuItems.filter((item) => Boolean(item.is_cta));
   const showTopBar = settings.top_bar_enabled !== "false";
 

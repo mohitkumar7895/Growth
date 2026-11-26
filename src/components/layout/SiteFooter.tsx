@@ -37,6 +37,25 @@ export default function SiteFooter({
       ? "bg-[#101C16]"
       : "bg-[var(--gr-deep)]";
 
+  const resolvedQuickLinks: NavigationItem[] = quickLinks.some(
+    (l) => l.url === "/register"
+  )
+    ? quickLinks
+    : [
+        ...quickLinks,
+        {
+          id: -102,
+          label: "Customer Registration",
+          url: "/register",
+          location: "footer_quick",
+          parent_id: null,
+          target: "_self",
+          sort_order: 99,
+          is_active: 1,
+          is_cta: 0,
+        },
+      ];
+
   return (
     <footer className={`border-t border-[#C6A66C]/25 ${footerBg} text-white`}>
       <div className="mx-auto max-w-7xl px-4 pb-28 pt-9 sm:px-6 sm:pb-28 sm:pt-12 lg:px-8">
@@ -96,7 +115,7 @@ export default function SiteFooter({
               Explore
             </h3>
             <ul className="mt-3 space-y-2 text-xs text-white/75 sm:mt-4 sm:space-y-2.5 sm:text-sm">
-              {quickLinks.map((link) => (
+              {resolvedQuickLinks.map((link) => (
                 <li key={link.id}>
                   <Link
                     href={link.url}
