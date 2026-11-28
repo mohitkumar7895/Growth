@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { query, queryOne, ensureLiveContentSynced } from "@/lib/db";
+import { query, queryOne } from "@/lib/db";
 import { SITE_CACHE_TAG } from "@/lib/cache";
 import type {
   WebsiteSettingsMap,
@@ -69,10 +69,25 @@ export const DEFAULT_SETTINGS: WebsiteSettingsMap = {
 
 const CACHE_OPTS = { tags: [SITE_CACHE_TAG], revalidate: 300 };
 
+async function safeList<T>(fn: () => Promise<T[]>): Promise<T[]> {
+  try {
+    return await fn();
+  } catch {
+    return [];
+  }
+}
+
+async function safeOne<T>(fn: () => Promise<T | null>): Promise<T | null> {
+  try {
+    return await fn();
+  } catch {
+    return null;
+  }
+}
+
 const fetchSettingsCached = unstable_cache(
   async (): Promise<WebsiteSettingsMap> => {
     try {
-      await ensureLiveContentSynced();
       const rows = await query<{ setting_key: string; setting_value: string | null }>(
         "SELECT setting_key, setting_value FROM website_settings"
       );
@@ -97,21 +112,22 @@ export async function getWebsiteSettings(): Promise<WebsiteSettingsMap> {
 
 const fetchNavigationCached = unstable_cache(
   async (location: string, activeOnly: boolean): Promise<NavigationItem[]> => {
-    await ensureLiveContentSynced();
-    const conditions: string[] = [];
-    const params: unknown[] = [];
-    if (location !== "ALL") {
-      conditions.push("location = ?");
-      params.push(location);
-    }
-    if (activeOnly) {
-      conditions.push("is_active = 1");
-    }
-    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-    return query<NavigationItem>(
-      `SELECT * FROM navigation_menus ${where} ORDER BY sort_order ASC, id ASC`,
-      params
-    );
+    return safeList(() => {
+      const conditions: string[] = [];
+      const params: unknown[] = [];
+      if (location !== "ALL") {
+        conditions.push("location = ?");
+        params.push(location);
+      }
+      if (activeOnly) {
+        conditions.push("is_active = 1");
+      }
+      const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+      return query<NavigationItem>(
+        `SELECT * FROM navigation_menus ${where} ORDER BY sort_order ASC, id ASC`,
+        params
+      );
+    });
   },
   ["navigation-menus"],
   CACHE_OPTS
@@ -126,13 +142,14 @@ export async function getNavigationMenus(
 
 const fetchHomepageSectionsCached = unstable_cache(
   async (includeHidden: boolean): Promise<HomepageSection[]> => {
-    await ensureLiveContentSynced();
-    const where = includeHidden
-      ? ""
-      : "WHERE is_visible = 1 AND status = 'published'";
-    return query<HomepageSection>(
-      `SELECT * FROM homepage_sections ${where} ORDER BY sort_order ASC, id ASC`
-    );
+    return safeList(() => {
+      const where = includeHidden
+        ? ""
+        : "WHERE is_visible = 1 AND status = 'published'";
+      return query<HomepageSection>(
+        `SELECT * FROM homepage_sections ${where} ORDER BY sort_order ASC, id ASC`
+      );
+    });
   },
   ["homepage-sections"],
   CACHE_OPTS
@@ -146,10 +163,12 @@ export async function getHomepageSections(
 
 const fetchCategoriesCached = unstable_cache(
   async (activeOnly: boolean): Promise<PropertyCategory[]> => {
-    const where = activeOnly ? "WHERE is_active = 1" : "";
-    return query<PropertyCategory>(
-      `SELECT * FROM property_categories ${where} ORDER BY sort_order ASC, id ASC`
-    );
+    return safeList(() => {
+      const where = activeOnly ? "WHERE is_active = 1" : "";
+      return query<PropertyCategory>(
+        `SELECT * FROM property_categories ${where} ORDER BY sort_order ASC, id ASC`
+      );
+    });
   },
   ["property-categories"],
   CACHE_OPTS
@@ -176,64 +195,66 @@ export interface PropertyFilterParams {
 
 const fetchPropertiesCached = unstable_cache(
   async (serializedKey: string): Promise<PropertyItem[]> => {
-    const filters = JSON.parse(serializedKey) as PropertyFilterParams;
-    const conditions: string[] = [];
-    const params: unknown[] = [];
+    return safeList(() => {
+      const filters = JSON.parse(serializedKey) as PropertyFilterParams;
+      const conditions: string[] = [];
+      const params: unknown[] = [];
 
-    if (!filters.includeDrafts) {
-      conditions.push("p.status = 'published'");
-    }
-    if (filters.property_type && filters.property_type !== "All") {
-      conditions.push("p.property_type = ?");
-      params.push(filters.property_type);
-    }
-    if (filters.location && filters.location !== "All") {
-      conditions.push("(p.location = ? OR p.city = ?)");
-      params.push(filters.location, filters.location);
-    }
-    if (
-      filters.budget_range &&
-      filters.budget_range !== "All" &&
-      filters.budget_range !== "Open to Options"
-    ) {
-      conditions.push("p.budget_range = ?");
-      params.push(filters.budget_range);
-    }
-    if (filters.purpose && filters.purpose !== "All") {
-      conditions.push("p.purpose = ?");
-      params.push(filters.purpose);
-    }
-    if (filters.property_status && filters.property_status !== "All") {
-      conditions.push("p.property_status LIKE ?");
-      params.push(`%${filters.property_status}%`);
-    }
-    if (filters.category) {
-      conditions.push("c.slug = ?");
-      params.push(filters.category);
-    }
-    if (filters.q) {
-      conditions.push(
-        "(p.title LIKE ? OR p.location LIKE ? OR p.sector LIKE ? OR p.short_description LIKE ? OR p.property_type LIKE ?)"
+      if (!filters.includeDrafts) {
+        conditions.push("p.status = 'published'");
+      }
+      if (filters.property_type && filters.property_type !== "All") {
+        conditions.push("p.property_type = ?");
+        params.push(filters.property_type);
+      }
+      if (filters.location && filters.location !== "All") {
+        conditions.push("(p.location = ? OR p.city = ?)");
+        params.push(filters.location, filters.location);
+      }
+      if (
+        filters.budget_range &&
+        filters.budget_range !== "All" &&
+        filters.budget_range !== "Open to Options"
+      ) {
+        conditions.push("p.budget_range = ?");
+        params.push(filters.budget_range);
+      }
+      if (filters.purpose && filters.purpose !== "All") {
+        conditions.push("p.purpose = ?");
+        params.push(filters.purpose);
+      }
+      if (filters.property_status && filters.property_status !== "All") {
+        conditions.push("p.property_status LIKE ?");
+        params.push(`%${filters.property_status}%`);
+      }
+      if (filters.category) {
+        conditions.push("c.slug = ?");
+        params.push(filters.category);
+      }
+      if (filters.q) {
+        conditions.push(
+          "(p.title LIKE ? OR p.location LIKE ? OR p.sector LIKE ? OR p.short_description LIKE ? OR p.property_type LIKE ?)"
+        );
+        const term = `%${filters.q}%`;
+        params.push(term, term, term, term, term);
+      }
+      if (filters.featured) {
+        conditions.push("p.is_featured = 1");
+      }
+
+      const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+      const limitSql = filters.limit ? `LIMIT ${Number(filters.limit)}` : "";
+
+      return query<PropertyItem>(
+        `SELECT p.*, c.name AS category_name
+         FROM properties p
+         LEFT JOIN property_categories c ON c.id = p.category_id
+         ${where}
+         ORDER BY p.is_featured DESC, p.created_at DESC
+         ${limitSql}`,
+        params
       );
-      const term = `%${filters.q}%`;
-      params.push(term, term, term, term, term);
-    }
-    if (filters.featured) {
-      conditions.push("p.is_featured = 1");
-    }
-
-    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-    const limitSql = filters.limit ? `LIMIT ${Number(filters.limit)}` : "";
-
-    return query<PropertyItem>(
-      `SELECT p.*, c.name AS category_name
-       FROM properties p
-       LEFT JOIN property_categories c ON c.id = p.category_id
-       ${where}
-       ORDER BY p.is_featured DESC, p.created_at DESC
-       ${limitSql}`,
-      params
-    );
+    });
   },
   ["properties-list"],
   CACHE_OPTS
@@ -247,13 +268,15 @@ export async function getProperties(
 
 const fetchPropertyBySlugCached = unstable_cache(
   async (slug: string): Promise<PropertyItem | null> => {
-    return queryOne<PropertyItem>(
-      `SELECT p.*, c.name AS category_name
-       FROM properties p
-       LEFT JOIN property_categories c ON c.id = p.category_id
-       WHERE p.slug = ? AND p.status = 'published'
-       LIMIT 1`,
-      [slug]
+    return safeOne(() =>
+      queryOne<PropertyItem>(
+        `SELECT p.*, c.name AS category_name
+         FROM properties p
+         LEFT JOIN property_categories c ON c.id = p.category_id
+         WHERE p.slug = ? AND p.status = 'published'
+         LIMIT 1`,
+        [slug]
+      )
     );
   },
   ["property-by-slug"],
@@ -266,39 +289,40 @@ export async function getPropertyBySlug(slug: string): Promise<PropertyItem | nu
 
 const fetchProjectsCached = unstable_cache(
   async (serializedKey: string): Promise<ProjectItem[]> => {
-    await ensureLiveContentSynced();
-    const filters = JSON.parse(serializedKey) as {
-      region?: string;
-      category?: string;
-      featuredOnly?: boolean;
-      includeDrafts?: boolean;
-      limit?: number;
-    };
-    const conditions: string[] = [];
-    const params: unknown[] = [];
+    return safeList(() => {
+      const filters = JSON.parse(serializedKey) as {
+        region?: string;
+        category?: string;
+        featuredOnly?: boolean;
+        includeDrafts?: boolean;
+        limit?: number;
+      };
+      const conditions: string[] = [];
+      const params: unknown[] = [];
 
-    if (!filters?.includeDrafts) {
-      conditions.push("status = 'published'");
-    }
-    if (filters?.region && filters.region !== "All Projects") {
-      conditions.push("(region_filter = ? OR location LIKE ?)");
-      params.push(filters.region, `%${filters.region}%`);
-    }
-    if (filters?.category && filters.category !== "All Projects") {
-      conditions.push("category = ?");
-      params.push(filters.category);
-    }
-    if (filters?.featuredOnly) {
-      conditions.push("is_featured = 1");
-    }
+      if (!filters?.includeDrafts) {
+        conditions.push("status = 'published'");
+      }
+      if (filters?.region && filters.region !== "All Projects") {
+        conditions.push("(region_filter = ? OR location LIKE ?)");
+        params.push(filters.region, `%${filters.region}%`);
+      }
+      if (filters?.category && filters.category !== "All Projects") {
+        conditions.push("category = ?");
+        params.push(filters.category);
+      }
+      if (filters?.featuredOnly) {
+        conditions.push("is_featured = 1");
+      }
 
-    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-    const limitSql = filters?.limit ? `LIMIT ${Number(filters.limit)}` : "";
+      const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+      const limitSql = filters?.limit ? `LIMIT ${Number(filters.limit)}` : "";
 
-    return query<ProjectItem>(
-      `SELECT * FROM projects ${where} ORDER BY sort_order ASC, is_featured DESC, id ASC ${limitSql}`,
-      params
-    );
+      return query<ProjectItem>(
+        `SELECT * FROM projects ${where} ORDER BY sort_order ASC, is_featured DESC, id ASC ${limitSql}`,
+        params
+      );
+    });
   },
   ["projects-list"],
   CACHE_OPTS
@@ -316,17 +340,18 @@ export async function getProjects(filters?: {
 
 const fetchProjectBySlugCached = unstable_cache(
   async (slug: string): Promise<ProjectItem | null> => {
-    await ensureLiveContentSynced();
-    const project = await queryOne<ProjectItem>(
-      `SELECT * FROM projects WHERE slug = ? AND status = 'published' LIMIT 1`,
-      [slug]
-    );
-    if (!project) return null;
-    const images = await query<ProjectImage>(
-      `SELECT * FROM project_images WHERE project_id = ? ORDER BY sort_order ASC, id ASC`,
-      [project.id]
-    );
-    return { ...project, images };
+    return safeOne(async () => {
+      const project = await queryOne<ProjectItem>(
+        `SELECT * FROM projects WHERE slug = ? AND status = 'published' LIMIT 1`,
+        [slug]
+      );
+      if (!project) return null;
+      const images = await query<ProjectImage>(
+        `SELECT * FROM project_images WHERE project_id = ? ORDER BY sort_order ASC, id ASC`,
+        [project.id]
+      );
+      return { ...project, images };
+    });
   },
   ["project-by-slug"],
   CACHE_OPTS
@@ -338,10 +363,12 @@ export async function getProjectBySlug(slug: string): Promise<ProjectItem | null
 
 const fetchServicesCached = unstable_cache(
   async (publishedOnly: boolean): Promise<ServiceItem[]> => {
-    const where = publishedOnly ? "WHERE status = 'published'" : "";
-    return query<ServiceItem>(
-      `SELECT * FROM services ${where} ORDER BY sort_order ASC, id ASC`
-    );
+    return safeList(() => {
+      const where = publishedOnly ? "WHERE status = 'published'" : "";
+      return query<ServiceItem>(
+        `SELECT * FROM services ${where} ORDER BY sort_order ASC, id ASC`
+      );
+    });
   },
   ["services-list"],
   CACHE_OPTS
@@ -353,9 +380,11 @@ export async function getServices(publishedOnly = true): Promise<ServiceItem[]> 
 
 const fetchServiceBySlugCached = unstable_cache(
   async (slug: string): Promise<ServiceItem | null> => {
-    return queryOne<ServiceItem>(
-      `SELECT * FROM services WHERE slug = ? AND status = 'published' LIMIT 1`,
-      [slug]
+    return safeOne(() =>
+      queryOne<ServiceItem>(
+        `SELECT * FROM services WHERE slug = ? AND status = 'published' LIMIT 1`,
+        [slug]
+      )
     );
   },
   ["service-by-slug"],
@@ -368,11 +397,13 @@ export async function getServiceBySlug(slug: string): Promise<ServiceItem | null
 
 const fetchTestimonialsCached = unstable_cache(
   async (publishedOnly: boolean, limit: number): Promise<TestimonialItem[]> => {
-    const where = publishedOnly ? "WHERE status = 'published'" : "";
-    const limitSql = limit > 0 ? `LIMIT ${Number(limit)}` : "";
-    return query<TestimonialItem>(
-      `SELECT * FROM testimonials ${where} ORDER BY sort_order ASC, id DESC ${limitSql}`
-    );
+    return safeList(() => {
+      const where = publishedOnly ? "WHERE status = 'published'" : "";
+      const limitSql = limit > 0 ? `LIMIT ${Number(limit)}` : "";
+      return query<TestimonialItem>(
+        `SELECT * FROM testimonials ${where} ORDER BY sort_order ASC, id DESC ${limitSql}`
+      );
+    });
   },
   ["testimonials-list"],
   CACHE_OPTS
@@ -387,8 +418,10 @@ export async function getTestimonials(
 
 const fetchBlogCategoriesCached = unstable_cache(
   async (): Promise<BlogCategory[]> => {
-    return query<BlogCategory>(
-      `SELECT * FROM blog_categories ORDER BY sort_order ASC, name ASC`
+    return safeList(() =>
+      query<BlogCategory>(
+        `SELECT * FROM blog_categories ORDER BY sort_order ASC, name ASC`
+      )
     );
   },
   ["blog-categories"],
@@ -401,47 +434,51 @@ export async function getBlogCategories(): Promise<BlogCategory[]> {
 
 const fetchBlogsCached = unstable_cache(
   async (serializedKey: string): Promise<BlogItem[]> => {
-    const filters = JSON.parse(serializedKey) as {
-      categorySlug?: string;
-      tagSlug?: string;
-      q?: string;
-      includeAllStatuses?: boolean;
-      limit?: number;
-    };
-    const conditions: string[] = [];
-    const params: unknown[] = [];
+    return safeList(() => {
+      const filters = JSON.parse(serializedKey) as {
+        categorySlug?: string;
+        tagSlug?: string;
+        q?: string;
+        includeAllStatuses?: boolean;
+        limit?: number;
+      };
+      const conditions: string[] = [];
+      const params: unknown[] = [];
 
-    if (!filters?.includeAllStatuses) {
-      conditions.push("b.status = 'published' AND (b.published_at IS NULL OR b.published_at <= NOW())");
-    }
-    if (filters?.categorySlug) {
-      conditions.push("bc.slug = ?");
-      params.push(filters.categorySlug);
-    }
-    if (filters?.tagSlug) {
-      conditions.push(
-        "EXISTS (SELECT 1 FROM blog_tag_relations btr JOIN blog_tags bt ON bt.id = btr.tag_id WHERE btr.blog_id = b.id AND bt.slug = ?)"
+      if (!filters?.includeAllStatuses) {
+        conditions.push(
+          "b.status = 'published' AND (b.published_at IS NULL OR b.published_at <= NOW())"
+        );
+      }
+      if (filters?.categorySlug) {
+        conditions.push("bc.slug = ?");
+        params.push(filters.categorySlug);
+      }
+      if (filters?.tagSlug) {
+        conditions.push(
+          "EXISTS (SELECT 1 FROM blog_tag_relations btr JOIN blog_tags bt ON bt.id = btr.tag_id WHERE btr.blog_id = b.id AND bt.slug = ?)"
+        );
+        params.push(filters.tagSlug);
+      }
+      if (filters?.q) {
+        conditions.push("(b.title LIKE ? OR b.excerpt LIKE ?)");
+        const t = `%${filters.q}%`;
+        params.push(t, t);
+      }
+
+      const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+      const limitSql = filters?.limit ? `LIMIT ${Number(filters.limit)}` : "";
+
+      return query<BlogItem>(
+        `SELECT b.*, bc.name AS category_name, bc.slug AS category_slug
+         FROM blogs b
+         LEFT JOIN blog_categories bc ON bc.id = b.category_id
+         ${where}
+         ORDER BY COALESCE(b.published_at, b.created_at) DESC
+         ${limitSql}`,
+        params
       );
-      params.push(filters.tagSlug);
-    }
-    if (filters?.q) {
-      conditions.push("(b.title LIKE ? OR b.excerpt LIKE ?)");
-      const t = `%${filters.q}%`;
-      params.push(t, t);
-    }
-
-    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-    const limitSql = filters?.limit ? `LIMIT ${Number(filters.limit)}` : "";
-
-    return query<BlogItem>(
-      `SELECT b.*, bc.name AS category_name, bc.slug AS category_slug
-       FROM blogs b
-       LEFT JOIN blog_categories bc ON bc.id = b.category_id
-       ${where}
-       ORDER BY COALESCE(b.published_at, b.created_at) DESC
-       ${limitSql}`,
-      params
-    );
+    });
   },
   ["blogs-list"],
   CACHE_OPTS
@@ -459,23 +496,25 @@ export async function getBlogs(filters?: {
 
 const fetchBlogBySlugCached = unstable_cache(
   async (slug: string): Promise<BlogItem | null> => {
-    const blog = await queryOne<BlogItem>(
-      `SELECT b.*, bc.name AS category_name, bc.slug AS category_slug
-       FROM blogs b
-       LEFT JOIN blog_categories bc ON bc.id = b.category_id
-       WHERE b.slug = ? AND b.status = 'published'
-       LIMIT 1`,
-      [slug]
-    );
-    if (!blog) return null;
-    const tags = await query<{ id: number; name: string; slug: string }>(
-      `SELECT bt.id, bt.name, bt.slug
-       FROM blog_tags bt
-       JOIN blog_tag_relations btr ON btr.tag_id = bt.id
-       WHERE btr.blog_id = ?`,
-      [blog.id]
-    );
-    return { ...blog, tags };
+    return safeOne(async () => {
+      const blog = await queryOne<BlogItem>(
+        `SELECT b.*, bc.name AS category_name, bc.slug AS category_slug
+         FROM blogs b
+         LEFT JOIN blog_categories bc ON bc.id = b.category_id
+         WHERE b.slug = ? AND b.status = 'published'
+         LIMIT 1`,
+        [slug]
+      );
+      if (!blog) return null;
+      const tags = await query<{ id: number; name: string; slug: string }>(
+        `SELECT bt.id, bt.name, bt.slug
+         FROM blog_tags bt
+         JOIN blog_tag_relations btr ON btr.tag_id = bt.id
+         WHERE btr.blog_id = ?`,
+        [blog.id]
+      );
+      return { ...blog, tags };
+    });
   },
   ["blog-by-slug"],
   CACHE_OPTS
@@ -487,10 +526,12 @@ export async function getBlogBySlug(slug: string): Promise<BlogItem | null> {
 
 const fetchFaqsCached = unstable_cache(
   async (activeOnly: boolean): Promise<FaqItem[]> => {
-    const where = activeOnly ? "WHERE is_active = 1" : "";
-    return query<FaqItem>(
-      `SELECT * FROM faqs ${where} ORDER BY sort_order ASC, id ASC`
-    );
+    return safeList(() => {
+      const where = activeOnly ? "WHERE is_active = 1" : "";
+      return query<FaqItem>(
+        `SELECT * FROM faqs ${where} ORDER BY sort_order ASC, id ASC`
+      );
+    });
   },
   ["faqs-list"],
   CACHE_OPTS
@@ -502,9 +543,11 @@ export async function getFaqs(activeOnly = true): Promise<FaqItem[]> {
 
 const fetchSeoMetadataCached = unstable_cache(
   async (pageKey: string): Promise<SeoMetadataItem | null> => {
-    return queryOne<SeoMetadataItem>(
-      `SELECT * FROM seo_metadata WHERE page_key = ? LIMIT 1`,
-      [pageKey]
+    return safeOne(() =>
+      queryOne<SeoMetadataItem>(
+        `SELECT * FROM seo_metadata WHERE page_key = ? LIMIT 1`,
+        [pageKey]
+      )
     );
   },
   ["seo-metadata"],
@@ -517,9 +560,11 @@ export async function getSeoMetadata(pageKey: string): Promise<SeoMetadataItem |
 
 const fetchLegalPageCached = unstable_cache(
   async (slug: string): Promise<LegalPageItem | null> => {
-    return queryOne<LegalPageItem>(
-      `SELECT * FROM legal_pages WHERE slug = ? AND status = 'published' LIMIT 1`,
-      [slug]
+    return safeOne(() =>
+      queryOne<LegalPageItem>(
+        `SELECT * FROM legal_pages WHERE slug = ? AND status = 'published' LIMIT 1`,
+        [slug]
+      )
     );
   },
   ["legal-page"],

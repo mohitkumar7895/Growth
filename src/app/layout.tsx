@@ -1,22 +1,7 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import { getWebsiteSettings } from "@/services/siteData";
 import { buildOrganizationJsonLd } from "@/lib/seo";
 import "./globals.css";
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-cormorant",
-  display: "swap",
-});
-
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-jakarta",
-  display: "swap",
-});
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getWebsiteSettings();
@@ -69,12 +54,18 @@ export default async function RootLayout({
   `;
 
   return (
-    <html
-      lang="en"
-      className={`${cormorant.variable} ${jakarta.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        />
         <style dangerouslySetInnerHTML={{ __html: dynamicThemeVars }} />
         <script
           type="application/ld+json"

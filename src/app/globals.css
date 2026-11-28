@@ -10,6 +10,8 @@
   --gr-white: #ffffff;
   --gr-dark: #1c2921;
   --gr-btn-radius: 0.5rem;
+  --font-cormorant: "Cormorant Garamond";
+  --font-jakarta: "Plus Jakarta Sans";
   --font-serif-luxury: var(--font-cormorant), Georgia, serif;
   --font-sans-luxury: var(--font-jakarta), system-ui, -apple-system, sans-serif;
 }
